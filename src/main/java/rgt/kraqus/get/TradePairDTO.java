@@ -1,8 +1,8 @@
-package kraqus.get;
+package rgt.kraqus.get;
 
 import java.math.BigDecimal;
 import java.util.Date;
-//import org.bson.types.ObjectId;
+import org.bson.types.ObjectId;
 
 /**
  * DTO for Kraken trade pairs
@@ -11,7 +11,7 @@ import java.util.Date;
  */
 public class TradePairDTO {
 
-    //private ObjectId id;
+    private ObjectId id;
     private BigDecimal price;
     private BigDecimal volume;
     private BigDecimal time;
@@ -131,7 +131,7 @@ public class TradePairDTO {
         this.pair = pair;
     }
 
-    /*
+
     public ObjectId getId() {
         return id;
     }
@@ -139,8 +139,7 @@ public class TradePairDTO {
     public void setId(ObjectId id) {
         this.id = id;
     }
-     */
-    
+     
     public String getMarketLimit() {
         return marketLimit;
     }
