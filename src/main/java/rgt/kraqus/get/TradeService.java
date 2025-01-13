@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import rgt.kraqus.Configuration;
+import rgt.kraqus.Config;
 import rgt.kraqus.MyException;
 
 /**
@@ -29,7 +29,7 @@ public class TradeService {
     private KrakenClientService krakenClient;
     
     @Inject
-    private Configuration config;
+    private Config config;
     
 
     private int pairTradeSize = 0;
