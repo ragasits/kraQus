@@ -1,5 +1,6 @@
 package rgt.kraqus.get;
 
+import com.mongodb.client.model.Sorts;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -15,7 +16,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import rgt.kraqus.Config;
+import rgt.kraqus.KraqusConfig;
 import rgt.kraqus.MyException;
 
 /**
@@ -27,12 +28,46 @@ public class TradeService {
 
     @RestClient
     private KrakenClientService krakenClient;
-    
+
     @Inject
-    private Config config;
-    
+    private KraqusConfig kraqusConfig;
 
     private int pairTradeSize = 0;
+
+    /**
+     * Get, convert, store trades from Kraken
+     *
+     */
+    public void callKrakenTrade() {
+
+        kraqusConfig.setRunTrade(false);
+
+        //Get last value from Mongo
+        String last = "0";
+        TradePairDTO lastDto = kraqusConfig.getTradePairColl().find()
+                .sort(Sorts.descending("last"))
+                .first();
+        if (lastDto != null) {
+            last = lastDto.getLast();
+        }
+
+        try {
+            JsonObject tradeJson = this.getRestTrade(last);
+            List<TradePairDTO> pairList = this.convertToDTO(tradeJson);
+
+            if (!pairList.isEmpty()) {
+                this.pairTradeSize = pairList.size();
+                kraqusConfig.getTradePairColl().insertMany(pairList);
+                Log.info("Trade Fired .... " + this.pairTradeSize + " " + pairList.get(0).getLastDate());
+            } else {
+                Log.info("Trade Fired .... Error: " + tradeJson.toString());
+            }
+
+            kraqusConfig.setRunTrade(true);
+        } catch (MyException ex) {
+            Log.info(ex.getMessage());
+        }
+    }
 
     /**
      * Call trades from Kraken Rest API
@@ -41,29 +76,29 @@ public class TradeService {
      */
     public void callKrakenTrade(String last) {
 
-        //config.setRunTrade(false);
+        kraqusConfig.setRunTrade(false);
         try {
             JsonObject tradeJson = this.getRestTrade(last);
             List<TradePairDTO> pairList = this.convertToDTO(tradeJson);
 
             if (!pairList.isEmpty()) {
                 this.pairTradeSize = pairList.size();
-                config.getTradePairColl().insertMany(pairList);
+                kraqusConfig.getTradePairColl().insertMany(pairList);
 
                 Log.info("Trade Fired .... " + this.pairTradeSize + " " + pairList.get(0).getLastDate());
             } else {
                 this.logTradeInfo(tradeJson);
             }
 
-            //config.setRunTrade(true);
+            kraqusConfig.setRunTrade(true);
         } catch (MyException ex) {
             Log.error(ex.getMessage());
         }
     }
 
     /**
-     * Logging tradeJson.toString() Solving Some warning: Conditionally
-     * executed code should be reachable:
+     * Logging tradeJson.toString() Solving Some warning: Conditionally executed
+     * code should be reachable:
      *
      * @param tradeJson
      */
@@ -72,7 +107,7 @@ public class TradeService {
             Log.info("Trade Fired....tradeJson is null");
         } else {
             String tradeJsonStr = tradeJson.toString();
-            Log.info("Trade Fired.... Error "+tradeJsonStr);
+            Log.info("Trade Fired.... Error " + tradeJsonStr);
         }
     }
 
@@ -134,6 +169,35 @@ public class TradeService {
         InputStreamReader in = new InputStreamReader(inputStream);
         JsonReader reader = Json.createReader(in);
         return reader.readObject();
+    }
+
+    /**
+     * Get last value
+     *
+     * @return
+     */
+    public String getLastValue() {
+
+        //Get last value from Mongo
+        TradePairDTO dto = this.getLast();
+
+        if (dto != null) {
+            return dto.getLast();
+        } else {
+            return "0";
+        }
+
+    }
+
+    /**
+     * Get last Trade pair
+     *
+     * @return
+     */
+    private TradePairDTO getLast() {
+        return kraqusConfig.getTradePairColl().find()
+                .sort(Sorts.descending("last"))
+                .first();
     }
 
 }

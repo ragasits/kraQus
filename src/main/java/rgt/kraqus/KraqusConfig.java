@@ -13,6 +13,7 @@ import jakarta.inject.Singleton;
 import org.bson.Document;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import rgt.kraqus.get.TradePairDTO;
+import rgt.kraqus.prod.ProdLogDTO;
 
 /**
  *
@@ -20,33 +21,37 @@ import rgt.kraqus.get.TradePairDTO;
  */
 @Singleton
 @Startup
-public class Config {
+public class KraqusConfig {
 
     @Inject
     private MongoClient mongoClient;
 
     @Inject
-    @ConfigProperty(name = "kraken.runTrade", defaultValue = "false")
+    @ConfigProperty(name = "kraqus.runTrade", defaultValue = "false")
     private boolean runTrade;
 
     @Inject
-    @ConfigProperty(name = "kraken.runCandle", defaultValue = "false")
+    @ConfigProperty(name = "kraqus.runCandle", defaultValue = "false")
     private boolean runCandle;
 
     @Inject
-    @ConfigProperty(name = "kraken.runProduction", defaultValue = "false")
+    @ConfigProperty(name = "kraqus.runProduction", defaultValue = "false")
     private boolean runProduction;
 
     private MongoCollection<TradePairDTO> tradePairColl;
+    private MongoCollection<ProdLogDTO> prodLogColl;
 
     @PostConstruct
     public void init() {
 
         MongoDatabase database = mongoClient.getDatabase("kraqus");
+        
         this.tradePairColl = database.getCollection("tradepair", TradePairDTO.class);
         if (!this.isIndex(this.tradePairColl, "last_-1")) {
             this.tradePairColl.createIndex(Indexes.descending("last"));
         }
+
+        this.prodLogColl = database.getCollection("prodlog", ProdLogDTO.class);
     }
 
     @PreDestroy
@@ -73,7 +78,11 @@ public class Config {
     }
 
     public MongoCollection<TradePairDTO> getTradePairColl() {
-        return mongoClient.getDatabase("kraqus").getCollection("tradepair", TradePairDTO.class);
+        return tradePairColl;
+    }
+
+    public MongoCollection<ProdLogDTO> getProdLogColl() {
+        return prodLogColl;
     }
 
     public boolean isRunTrade() {
