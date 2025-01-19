@@ -13,7 +13,6 @@ import jakarta.inject.Singleton;
 import org.bson.Document;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import rgt.kraqus.get.TradePairDTO;
-import rgt.kraqus.prod.ProdLogDTO;
 
 /**
  *
@@ -39,7 +38,6 @@ public class KraqusConfig {
     private boolean runProduction;
 
     private MongoCollection<TradePairDTO> tradePairColl;
-    private MongoCollection<ProdLogDTO> prodLogColl;
 
     @PostConstruct
     public void init() {
@@ -50,8 +48,6 @@ public class KraqusConfig {
         if (!this.isIndex(this.tradePairColl, "last_-1")) {
             this.tradePairColl.createIndex(Indexes.descending("last"));
         }
-
-        this.prodLogColl = database.getCollection("prodlog", ProdLogDTO.class);
     }
 
     @PreDestroy
@@ -79,10 +75,6 @@ public class KraqusConfig {
 
     public MongoCollection<TradePairDTO> getTradePairColl() {
         return tradePairColl;
-    }
-
-    public MongoCollection<ProdLogDTO> getProdLogColl() {
-        return prodLogColl;
     }
 
     public boolean isRunTrade() {

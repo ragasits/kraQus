@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 import java.util.Calendar;
 import java.util.Date;
 import rgt.kraqus.KraqusConfig;
+import rgt.kraqus.MyException;
 import rgt.kraqus.get.TradeService;
 
 /**
@@ -22,6 +23,9 @@ public class ProdService {
     @Inject
     TradeService tradeService;
 
+    /**
+     * Run scheduled production process
+     */
     @Scheduled(cron = "{cron.expr}")
     public void runProduction() {
         Date runDate = Calendar.getInstance().getTime();
@@ -38,8 +42,14 @@ public class ProdService {
             return;
         }
 
-        // get Trades
-        runTrade(runDate);
+        try {
+            // get Trades
+            runTrade(runDate);
+        } catch (NumberFormatException | MyException ex) {
+            Log.info(ex.getMessage());
+            config.setRunProduction(true);
+            return;
+        }
 
 //        //Calculate Candles
 //        candleEjb.deleteLastCandle();
@@ -54,14 +64,6 @@ public class ProdService {
 
         Date stopdate = Calendar.getInstance().getTime();
         Log.info("Stop runProduction: " + stopdate);
-
-        //Save log
-        ProdLogDTO dto = new ProdLogDTO(runDate,
-                config.isRunProduction(),
-                config.isRunTrade(),
-                config.isRunCandle(), stopdate);
-
-        config.getProdLogColl().insertOne(dto);
     }
 
     /**
@@ -70,7 +72,7 @@ public class ProdService {
      * @param runDate
      * @throws NumberFormatException
      */
-    private void runTrade(Date runDate) throws NumberFormatException {
+    private void runTrade(Date runDate) throws NumberFormatException, MyException {
         config.setRunProduction(false);
 
         long runTime = runDate.getTime();
@@ -83,20 +85,13 @@ public class ProdService {
             lastTime = Long.parseLong(last.substring(0, 13));
         }
 
-        Log.info("runProduction: runTime: " + runTime + " lastTime: " + lastTime);
-
-        int i = 0;
+        Log.info("runTime: " + runTime + " lastTime: " + lastTime);
 
         // Get Trades
-        while ((runTime > lastTime) && (i < 20)) {
+        while (runTime > lastTime) {
             tradeService.callKrakenTrade(last);
             last = tradeService.getLastValue();
             lastTime = Long.parseLong(last.substring(0, 13));
-
-            Log.info("i:" + i);
-
-            i++;
-
         }
 
         config.setRunTrade(false);

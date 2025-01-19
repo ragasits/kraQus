@@ -35,65 +35,33 @@ public class TradeService {
     private int pairTradeSize = 0;
 
     /**
-     * Get, convert, store trades from Kraken
-     *
-     */
-    public void callKrakenTrade() {
-
-        kraqusConfig.setRunTrade(false);
-
-        //Get last value from Mongo
-        String last = "0";
-        TradePairDTO lastDto = kraqusConfig.getTradePairColl().find()
-                .sort(Sorts.descending("last"))
-                .first();
-        if (lastDto != null) {
-            last = lastDto.getLast();
-        }
-
-        try {
-            JsonObject tradeJson = this.getRestTrade(last);
-            List<TradePairDTO> pairList = this.convertToDTO(tradeJson);
-
-            if (!pairList.isEmpty()) {
-                this.pairTradeSize = pairList.size();
-                kraqusConfig.getTradePairColl().insertMany(pairList);
-                Log.info("Trade Fired .... " + this.pairTradeSize + " " + pairList.get(0).getLastDate());
-            } else {
-                Log.info("Trade Fired .... Error: " + tradeJson.toString());
-            }
-
-            kraqusConfig.setRunTrade(true);
-        } catch (MyException ex) {
-            Log.info(ex.getMessage());
-        }
-    }
-
-    /**
      * Call trades from Kraken Rest API
      *
      * @param last
      */
-    public void callKrakenTrade(String last) {
+    public void callKrakenTrade(String last) throws MyException {
 
         kraqusConfig.setRunTrade(false);
-        try {
-            JsonObject tradeJson = this.getRestTrade(last);
-            List<TradePairDTO> pairList = this.convertToDTO(tradeJson);
+        JsonObject tradeJson = this.getRestTrade(last);
 
-            if (!pairList.isEmpty()) {
-                this.pairTradeSize = pairList.size();
-                kraqusConfig.getTradePairColl().insertMany(pairList);
-
-                Log.info("Trade Fired .... " + this.pairTradeSize + " " + pairList.get(0).getLastDate());
-            } else {
-                this.logTradeInfo(tradeJson);
-            }
-
-            kraqusConfig.setRunTrade(true);
-        } catch (MyException ex) {
-            Log.error(ex.getMessage());
+        String errorMessage = tradeJson.get("error").toString();
+        if (errorMessage.contains("EGeneral")) {
+            throw new MyException(errorMessage);
+            
         }
+
+        List<TradePairDTO> pairList = this.convertToDTO(tradeJson);
+
+        if (!pairList.isEmpty()) {
+            this.pairTradeSize = pairList.size();
+            kraqusConfig.getTradePairColl().insertMany(pairList);
+
+            Log.info("Trade Fired .... " + this.pairTradeSize + " " + pairList.get(0).getLastDate());
+        } else {
+            this.logTradeInfo(tradeJson);
+        }
+
+        kraqusConfig.setRunTrade(true);
     }
 
     /**
@@ -159,7 +127,7 @@ public class TradeService {
     private JsonObject getRestTrade(String last) throws MyException {
 
         Response response = krakenClient.getTrade("XBTEUR", last);
-        Log.info(response.getStatus());
+        Log.debug(response.getStatus());
 
         if (response.getStatus() != 200) {
             throw new MyException("getRestTrade error:" + response.getStatus());
