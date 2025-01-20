@@ -6,8 +6,12 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.Calendar;
 import java.util.Date;
-import rgt.kraqus.KraqusConfig;
+import org.eclipse.microprofile.context.ManagedExecutor;
+import rgt.kraqus.MyConfig;
 import rgt.kraqus.MyException;
+import rgt.kraqus.calc.CandleDTO;
+import rgt.kraqus.calc.CandleService;
+import rgt.kraqus.get.TradePairDTO;
 import rgt.kraqus.get.TradeService;
 
 /**
@@ -18,18 +22,19 @@ import rgt.kraqus.get.TradeService;
 public class ProdService {
 
     @Inject
-    KraqusConfig config;
+    MyConfig config;
 
     @Inject
     TradeService tradeService;
 
-    /**
-     * Run scheduled production process
-     */
+    @Inject
+    CandleService candleService;
+
+    @Inject
+    ManagedExecutor executor;
+
     @Scheduled(cron = "{cron.expr}")
-    public void runProduction() {
-        Date runDate = Calendar.getInstance().getTime();
-        Log.info("Start runProduction: " + runDate);
+    public void startWork() {
 
         //Checks
         if (!config.isRunProduction()) {
@@ -42,28 +47,63 @@ public class ProdService {
             return;
         }
 
+        executor.submit(() -> runProduction());
+    }
+
+    /**
+     * Run scheduled production process
+     */
+    public void runProduction() {
+        Date runDate = Calendar.getInstance().getTime();
+        Log.info("runProduction: Start ");
+
         try {
             // get Trades
             runTrade(runDate);
         } catch (NumberFormatException | MyException ex) {
-            Log.info(ex.getMessage());
-            config.setRunProduction(true);
-            return;
+            Log.error(ex.getMessage());
         }
 
-//        //Calculate Candles
-//        candleEjb.deleteLastCandle();
-//        try {
-//            this.createCandle(runDate);
-//            candleEjb.callCandleProd();
-//        } catch (MyException ex) {
-//            Logger.getLogger(ProdEJB.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        //Calculate Candles
+        candleService.deleteLastCandle();
+        try {
+            this.createCandle();
+            candleService.callCandleProd();
+        } catch (MyException ex) {
+            Log.error(ex.getMessage());
+        }
         config.setRunCandle(false);
         config.setRunProduction(true);
 
-        Date stopdate = Calendar.getInstance().getTime();
-        Log.info("Stop runProduction: " + stopdate);
+        Log.info("runProduction: Done");
+    }
+
+    /**
+     * Create candles
+     *
+     * @param runDate
+     * @throws MyException
+     */
+    private void createCandle() throws MyException {
+        Date startDate = candleService.getStartDate();
+        Calendar cal = Calendar.getInstance();
+
+        TradePairDTO dto = tradeService.getLast();
+        if (dto == null || dto.getTimeDate() == null) {
+            throw new MyException("Empty trade collection or invalid stop date");
+        }
+
+        //Generate candle dates
+        Date stopDate = dto.getTimeDate();
+        while (startDate.getTime() < stopDate.getTime()) {
+            Log.debug("calcDateList " + startDate + " " + stopDate);
+
+            config.getCandleColl().insertOne(new CandleDTO(startDate));
+            cal.setTime(startDate);
+            cal.add(Calendar.MINUTE, 30);
+            startDate = cal.getTime();
+        }
+        Log.info("calcDateList " + startDate + "-" + stopDate);
     }
 
     /**

@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import rgt.kraqus.KraqusConfig;
+import rgt.kraqus.MyConfig;
 import rgt.kraqus.MyException;
 
 /**
@@ -30,7 +30,7 @@ public class TradeService {
     private KrakenClientService krakenClient;
 
     @Inject
-    private KraqusConfig kraqusConfig;
+    private MyConfig kraqusConfig;
 
     private int pairTradeSize = 0;
 
@@ -162,7 +162,7 @@ public class TradeService {
      *
      * @return
      */
-    private TradePairDTO getLast() {
+    public TradePairDTO getLast() {
         return kraqusConfig.getTradePairColl().find()
                 .sort(Sorts.descending("last"))
                 .first();

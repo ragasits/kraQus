@@ -4,6 +4,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import io.quarkus.runtime.Startup;
 import jakarta.annotation.PostConstruct;
@@ -12,6 +13,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.Document;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import rgt.kraqus.calc.CandleDTO;
 import rgt.kraqus.get.TradePairDTO;
 
 /**
@@ -20,7 +22,7 @@ import rgt.kraqus.get.TradePairDTO;
  */
 @Singleton
 @Startup
-public class KraqusConfig {
+public class MyConfig {
 
     @Inject
     private MongoClient mongoClient;
@@ -38,15 +40,30 @@ public class KraqusConfig {
     private boolean runProduction;
 
     private MongoCollection<TradePairDTO> tradePairColl;
+    private MongoCollection<CandleDTO> candleColl;
 
     @PostConstruct
     public void init() {
 
         MongoDatabase database = mongoClient.getDatabase("kraqus");
-        
+
         this.tradePairColl = database.getCollection("tradepair", TradePairDTO.class);
-        if (!this.isIndex(this.tradePairColl, "last_-1")) {
+        if (!this.isIndex(tradePairColl, "last_-1")) {
             this.tradePairColl.createIndex(Indexes.descending("last"));
+        }
+        if (!this.isIndex(tradePairColl, "timeDate_1")) {
+            this.tradePairColl.createIndex(Indexes.ascending("timeDate"));
+        }
+
+        this.candleColl = database.getCollection("candle", CandleDTO.class);
+        if (!this.isIndex(candleColl, "startDate_1")) {
+            this.candleColl.createIndex(Indexes.ascending("startDate"), new IndexOptions().unique(true));
+        }
+        if (!this.isIndex(candleColl, "startDate_-1")) {
+            this.candleColl.createIndex(Indexes.descending("startDate"), new IndexOptions().unique(true));
+        }
+        if (!this.isIndex(candleColl, "calcCandle_1")) {
+            this.candleColl.createIndex(Indexes.ascending("calcCandle"));
         }
     }
 
@@ -75,6 +92,10 @@ public class KraqusConfig {
 
     public MongoCollection<TradePairDTO> getTradePairColl() {
         return tradePairColl;
+    }
+
+    public MongoCollection<CandleDTO> getCandleColl() {
+        return candleColl;
     }
 
     public boolean isRunTrade() {
