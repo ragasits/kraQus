@@ -7,6 +7,7 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.gte;
 import static com.mongodb.client.model.Filters.lt;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.result.DeleteResult;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -64,13 +65,15 @@ public class CandleService {
      * Delete empty candles open = 0
      */
     private void deleteEmptyCandles() {
-        config.getCandleColl()
+        DeleteResult result = config.getCandleColl()
                 .deleteMany(
                         and(
                                 eq("calcCandle", true),
                                 eq("open", 0)
                         )
                 );
+        
+        Log.info("deleteEmptyCandles: "+result.getDeletedCount());
     }
 
     /**

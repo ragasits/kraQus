@@ -30,7 +30,7 @@ public class TradeService {
     private KrakenClientService krakenClient;
 
     @Inject
-    private MyConfig kraqusConfig;
+    private MyConfig config;
 
     private int pairTradeSize = 0;
 
@@ -53,7 +53,7 @@ public class TradeService {
 
         if (!pairList.isEmpty()) {
             this.pairTradeSize = pairList.size();
-            kraqusConfig.getTradePairColl().insertMany(pairList);
+            config.getTradePairColl().insertMany(pairList);
 
             Log.info("Trade Fired .... " + this.pairTradeSize + " " + pairList.get(0).getLastDate());
         } else {
@@ -160,9 +160,23 @@ public class TradeService {
      * @return
      */
     public TradePairDTO getLast() {
-        return kraqusConfig.getTradePairColl().find()
+        return config.getTradePairColl().find()
                 .sort(Sorts.descending("last"))
                 .first();
     }
+    
+    /**
+     * get Last limit size trade pairs
+     *
+     * @param limit
+     * @return
+     */
+    public List<TradePairDTO> getLasts(int limit) {
+        return config.getTradePairColl()
+                .find()
+                .sort(Sorts.descending("timeDate"))
+                .limit(limit)
+                .into(new ArrayList<>());
+    }    
 
 }
