@@ -28,14 +28,6 @@ public class MyConfig {
     private MongoClient mongoClient;
 
     @Inject
-    @ConfigProperty(name = "kraqus.runTrade", defaultValue = "false")
-    private boolean runTrade;
-
-    @Inject
-    @ConfigProperty(name = "kraqus.runCandle", defaultValue = "false")
-    private boolean runCandle;
-
-    @Inject
     @ConfigProperty(name = "kraqus.runProduction", defaultValue = "false")
     private boolean runProduction;
 
@@ -96,22 +88,6 @@ public class MyConfig {
 
     public MongoCollection<CandleDTO> getCandleColl() {
         return candleColl;
-    }
-
-    public boolean isRunTrade() {
-        return runTrade;
-    }
-
-    public void setRunTrade(boolean runTrade) {
-        this.runTrade = runTrade;
-    }
-
-    public boolean isRunCandle() {
-        return runCandle;
-    }
-
-    public void setRunCandle(boolean runCandle) {
-        this.runCandle = runCandle;
     }
 
     public boolean isRunProduction() {

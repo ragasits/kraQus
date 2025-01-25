@@ -42,11 +42,6 @@ public class ProdService {
             return;
         }
 
-        if (config.isRunTrade() || config.isRunCandle()) {
-            Log.info("isRunTrade " + config.isRunTrade() + " isRunCandle: " + config.isRunCandle());
-            return;
-        }
-
         executor.submit(() -> runProduction());
     }
 
@@ -72,7 +67,6 @@ public class ProdService {
         } catch (MyException ex) {
             Log.error(ex.getMessage());
         }
-        config.setRunCandle(false);
         config.setRunProduction(true);
 
         Log.info("runProduction: Done");
@@ -95,6 +89,8 @@ public class ProdService {
 
         //Generate candle dates
         Date stopDate = dto.getTimeDate();
+        Log.info("createCandle: startDate: " + startDate);
+
         while (startDate.getTime() < stopDate.getTime()) {
             Log.debug("calcDateList " + startDate + " " + stopDate);
 
@@ -103,7 +99,8 @@ public class ProdService {
             cal.add(Calendar.MINUTE, 30);
             startDate = cal.getTime();
         }
-        Log.info("calcDateList " + startDate + "-" + stopDate);
+        Log.info("createCandle: stopDate: " + stopDate);
+
     }
 
     /**
@@ -133,7 +130,5 @@ public class ProdService {
             last = tradeService.getLastValue();
             lastTime = Long.parseLong(last.substring(0, 13));
         }
-
-        config.setRunTrade(false);
     }
 }

@@ -41,7 +41,6 @@ public class TradeService {
      */
     public void callKrakenTrade(String last) throws MyException {
 
-        kraqusConfig.setRunTrade(false);
         JsonObject tradeJson = this.getRestTrade(last);
 
         String errorMessage = tradeJson.get("error").toString();
@@ -60,8 +59,6 @@ public class TradeService {
         } else {
             this.logTradeInfo(tradeJson);
         }
-
-        kraqusConfig.setRunTrade(true);
     }
 
     /**

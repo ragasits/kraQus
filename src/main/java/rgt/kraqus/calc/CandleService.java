@@ -167,8 +167,6 @@ public class CandleService {
      * Run candle generation methods in production mode
      */
     public void callCandleProd() {
-        config.setRunCandle(false);
-
         this.calcCandle();
         this.deleteEmptyCandles();
         maService.calculateMovingAverage();
@@ -176,7 +174,6 @@ public class CandleService {
         rsiService.calculateRsi();
         macdService.calculateMacd();
         cciService.calculateCci();
-        config.setRunCandle(true);
     }
 
     /**
