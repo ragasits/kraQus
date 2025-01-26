@@ -46,7 +46,7 @@ public class TradeService {
         String errorMessage = tradeJson.get("error").toString();
         if (errorMessage.contains("EGeneral")) {
             throw new MyException(errorMessage);
-            
+
         }
 
         List<TradePairDTO> pairList = this.convertToDTO(tradeJson);
@@ -164,7 +164,7 @@ public class TradeService {
                 .sort(Sorts.descending("last"))
                 .first();
     }
-    
+
     /**
      * get Last limit size trade pairs
      *
@@ -177,6 +177,17 @@ public class TradeService {
                 .sort(Sorts.descending("timeDate"))
                 .limit(limit)
                 .into(new ArrayList<>());
-    }    
+    }
+
+    /**
+     * Get first trade
+     * @return 
+     */
+    public TradePairDTO getFirst() {
+        return config.getTradePairColl()
+                .find()
+                .sort(Sorts.ascending("timeDate"))
+                .first();
+    }
 
 }

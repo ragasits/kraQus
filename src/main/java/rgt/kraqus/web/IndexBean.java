@@ -3,10 +3,14 @@ package rgt.kraqus.web;
 import java.io.Serializable;
 
 import jakarta.enterprise.context.SessionScoped;
-import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.FacesContext;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import java.util.List;
+import java.util.Date;
+import rgt.kraqus.MyConfig;
+import rgt.kraqus.calc.CandleDTO;
+import rgt.kraqus.calc.CandleService;
+import rgt.kraqus.get.TradePairDTO;
+import rgt.kraqus.get.TradeService;
 
 /**
  * JSF bean for Index page
@@ -18,53 +22,66 @@ import java.util.List;
 public class IndexBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private List<String> resultList;
 
-    /*
-    @EJB
-    ConfigEJB config;
-    @EJB
-    TimerEJB timer;
-    @EJB
-    TradeEJB trade;
-    @EJB
-    CandleEJB candle;
-    @EJB
-    BollingerEJB bollinger;
-    */
+    @Inject
+    private MyConfig config;
+
+    @Inject
+    private TradeService tradeService;
+
+    @Inject
+    private CandleService candleService;
+
+    public boolean isRunProduction() {
+        return config.isRunProduction();
+    }
 
     /**
-     * Show check message
-     *
-     * @param type
-     * @param message
+     * getFirst Trade
+     * @return 
      */
-    private void showResult(String type, String message) {
-        FacesMessage msg;
-
-        if (this.resultList.isEmpty()) {
-            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, type, message + ": OK");
-        } else {
-            msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Candle", message + ": Errors(" + this.resultList.size() + ")");
+    public Date getFirstTradeDate() {
+        TradePairDTO trade = tradeService.getFirst();
+        if (trade != null) {
+            return trade.getTimeDate();
         }
-        FacesContext.getCurrentInstance().addMessage(null, msg);
+        return null;
     }
 
-
-
-
-
-
-
-    public List<String> getResultList() {
-        return resultList;
+    /**
+     * Get last trade
+     * @return 
+     */
+    public Date getLastTradeDate() {
+        TradePairDTO trade = tradeService.getLast();
+        if (trade != null) {
+            return trade.getTimeDate();
+        }
+        return null;
     }
 
-    public String getResultText() {
-        if (this.resultList == null || this.resultList.isEmpty()) {
-            return "Result";
+    /**
+     * Get first Candle
+     * @return 
+     */
+    public Date getFirstCandleDate() {
+        CandleDTO dto = candleService.getFirst();
+        if (dto != null) {
+            return dto.getStartDate();
         }
-        return "Result (" + this.resultList.size() + ")";
+        return null;
+    }
+
+    /**
+     * Get Last Candle
+     * @return 
+     */
+    public Date getLasttCandleDate() {
+        CandleDTO dto = candleService.getLast();
+        if (dto != null) {
+            return dto.getStartDate();
+        }
+        return null;
     }
 
 }

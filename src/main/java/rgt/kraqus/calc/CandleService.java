@@ -72,8 +72,8 @@ public class CandleService {
                                 eq("open", 0)
                         )
                 );
-        
-        Log.info("deleteEmptyCandles: "+result.getDeletedCount());
+
+        Log.info("deleteEmptyCandles: " + result.getDeletedCount());
     }
 
     /**
@@ -81,7 +81,7 @@ public class CandleService {
      *
      * @return
      */
-    private CandleDTO getLast() {
+    public CandleDTO getLast() {
         return config.getCandleColl()
                 .find()
                 .sort(Sorts.descending(STARTDATE))
@@ -99,6 +99,17 @@ public class CandleService {
                 .find(lt(STARTDATE, startDate))
                 .sort(Sorts.descending(STARTDATE))
                 .limit(1)
+                .first();
+    }
+
+    /**
+     * Get first Candle
+     * @return 
+     */
+    public CandleDTO getFirst() {
+        return this.config.getCandleColl()
+                .find()
+                .sort(Sorts.ascending(STARTDATE))
                 .first();
     }
 
