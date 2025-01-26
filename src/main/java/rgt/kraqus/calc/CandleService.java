@@ -6,6 +6,7 @@ import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.gte;
 import static com.mongodb.client.model.Filters.lt;
+import static com.mongodb.client.model.Filters.lte;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.DeleteResult;
 import io.quarkus.logging.Log;
@@ -61,8 +62,8 @@ public class CandleService {
                 .find(eq(STARTDATE, startDate))
                 .first();
     }
-    
-   /**
+
+    /**
      * Get one Candle by ID
      *
      * @param id
@@ -72,8 +73,22 @@ public class CandleService {
         return config.getCandleColl()
                 .find(eq("_id", id))
                 .first();
-    }    
+    }
     
+    /**
+     * Get Candles
+     *
+     * @param first
+     * @param last
+     * @return
+     */
+    public List<CandleDTO> get(Date first, Date last) {
+        return config.getCandleColl()
+                .find(and(gte(STARTDATE, first), lte(STARTDATE, last)))
+                .sort(Sorts.ascending(STARTDATE))
+                .into(new ArrayList<>());
+    }    
+
     /**
      * Get first date from the candle collection
      *
@@ -90,8 +105,8 @@ public class CandleService {
         }
 
         return dto.getStartDate();
-    }    
-    
+    }
+
     /**
      * Get latest date value from Candle collection
      *
@@ -107,8 +122,8 @@ public class CandleService {
             return null;
         }
         return dto.getStartDate();
-    }    
-    
+    }
+
     /**
      * Get one day's all Candles
      *
@@ -126,6 +141,35 @@ public class CandleService {
                 .sort(Sorts.ascending(STARTDATE))
                 .into(new ArrayList<>());
 
+    }
+
+    /**
+     * get last "limit" size candles
+     *
+     * @param limit
+     * @return
+     */
+    public List<CandleDTO> getLasts(int limit) {
+        return config.getCandleColl()
+                .find()
+                .sort(Sorts.descending(STARTDATE))
+                .limit(limit)
+                .into(new ArrayList<>());
+    }
+    
+    /**
+     * get candles last "limit" size from startDate
+     *
+     * @param startDate
+     * @param limit
+     * @return
+     */
+    public List<CandleDTO> getLasts(Date startDate, int limit) {
+        return config.getCandleColl()
+                .find(lt(STARTDATE, startDate))
+                .sort(Sorts.descending(STARTDATE))
+                .limit(limit)
+                .into(new ArrayList<>());
     }    
 
     /**

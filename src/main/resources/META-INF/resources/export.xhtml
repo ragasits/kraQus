@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ez="jakarta.faces.composite/ezcomp">
+
+    <h:head>
+        <title>KrakEE</title>
+    </h:head>
+
+    <h:body>
+        <f:view>
+            <h:form>
+                <ez:globalMenu/>
+            </h:form>
+
+            <h:form id="form1">
+
+                <p:blockUI block="form1" trigger="csvBtn, arffBtn">
+                    <p:graphicImage value="/resources/ajax-loader.gif" />
+                </p:blockUI>  
+
+                <p:messages id="msgs" showDetail="false" >
+                    <p:autoUpdate />
+                </p:messages>   
+
+                <p:panelGrid columns="8" layout="tabular">
+                    <p:outputLabel value="Learn:" style="font-weight: bold"/>
+                    <p:selectOneMenu value="#{exportBean.selectedLearn}" id="nameList">
+                        <f:selectItem itemLabel="-" itemValue=""/>
+                        <f:selectItems value="#{exportBean.learnNameList}" var="names"
+                                       itemLabel="#{names}" itemValue="#{names}" />
+                        <p:ajax event="itemSelect" listener="#{exportBean.updateLists}" update="buyList,sellList"/>
+                    </p:selectOneMenu>
+
+
+                    <p:outputLabel value="Buy:" style="font-weight: bold"/>
+                    <p:selectOneMenu value="#{exportBean.selectedBuyTime}" id="buyList">
+                        <f:selectItem itemLabel="-" itemValue=""/>
+                        <f:selectItems value="#{exportBean.buyList}" var="item"
+                                       itemLabel="#{item.startDate}" itemValue="#{item.startDate.time}" />                          
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Sell:" style="font-weight: bold"/>
+                    <p:selectOneMenu value="#{exportBean.selectedSellTime}" id="sellList">
+                        <f:selectItem itemLabel="-" itemValue=""/>
+                        <f:selectItems value="#{exportBean.sellList}" var="item1"
+                                       itemLabel="#{item1.startDate}" itemValue="#{item1.startDate.time}" />                          
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Type:" style="font-weight: bold"/>
+                    <p:selectOneMenu value="#{exportBean.selectedExportType}" id="typeList">
+                        <f:selectItem itemLabel="-" itemValue=""/>
+                        <f:selectItems value="#{exportBean.exportTypes}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Export:" style="font-weight: bold"/>
+
+                    <p:commandButton value="toCSV" id="csvBtn"
+                                     actionListener="#{exportBean.onExport('csv')}"
+                                     onclick="PrimeFaces.monitorDownload(start, stop);"
+                                     ajax="false">
+                        <p:fileDownload value="#{exportBean.file}" />
+                    </p:commandButton>                    
+
+                    <p:commandButton value="toARFF" id="arffBtn"
+                                     actionListener="#{exportBean.onExport('arff')}"
+                                     onclick="PrimeFaces.monitorDownload(start, stop);"
+                                     ajax="false">
+                        <p:fileDownload value="#{exportBean.file}" />
+                    </p:commandButton>                                        
+                </p:panelGrid>
+            </h:form>
+        </f:view>                
+    </h:body>
+</html>
+
+
