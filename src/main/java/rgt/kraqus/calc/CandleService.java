@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import org.bson.types.ObjectId;
 import rgt.kraqus.MyConfig;
 import rgt.kraqus.MyException;
 import rgt.kraqus.get.TradePairDTO;
@@ -48,6 +49,84 @@ public class CandleService {
 
     @Inject
     CciService cciService;
+
+    /**
+     * Get one Candle by startDate
+     *
+     * @param startDate
+     * @return
+     */
+    public CandleDTO get(Date startDate) {
+        return this.config.getCandleColl()
+                .find(eq(STARTDATE, startDate))
+                .first();
+    }
+    
+   /**
+     * Get one Candle by ID
+     *
+     * @param id
+     * @return
+     */
+    public CandleDTO get(ObjectId id) {
+        return config.getCandleColl()
+                .find(eq("_id", id))
+                .first();
+    }    
+    
+    /**
+     * Get first date from the candle collection
+     *
+     * @return
+     */
+    public Date getFirstDate() {
+        CandleDTO dto = config.getCandleColl()
+                .find()
+                .sort(Sorts.ascending(STARTDATE))
+                .first();
+
+        if (dto == null) {
+            return null;
+        }
+
+        return dto.getStartDate();
+    }    
+    
+    /**
+     * Get latest date value from Candle collection
+     *
+     * @return
+     */
+    public Date getLatesDate() {
+        CandleDTO dto = config.getCandleColl()
+                .find()
+                .sort(Sorts.descending(STARTDATE))
+                .first();
+
+        if (dto == null) {
+            return null;
+        }
+        return dto.getStartDate();
+    }    
+    
+    /**
+     * Get one day's all Candles
+     *
+     * @param startDate
+     * @return
+     */
+    public List<CandleDTO> getOneDay(Date startDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+        cal.add(Calendar.DAY_OF_YEAR, 1);
+        Date stopDate = cal.getTime();
+
+        return config.getCandleColl()
+                .find(and(gte(STARTDATE, startDate), lt(STARTDATE, stopDate)))
+                .sort(Sorts.ascending(STARTDATE))
+                .into(new ArrayList<>());
+
+    }    
 
     /**
      * Delete the last candle
@@ -104,7 +183,8 @@ public class CandleService {
 
     /**
      * Get first Candle
-     * @return 
+     *
+     * @return
      */
     public CandleDTO getFirst() {
         return this.config.getCandleColl()

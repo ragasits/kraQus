@@ -15,6 +15,7 @@ import org.bson.Document;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import rgt.kraqus.calc.CandleDTO;
 import rgt.kraqus.get.TradePairDTO;
+import rgt.kraqus.learn.LearnDTO;
 
 /**
  *
@@ -33,6 +34,7 @@ public class MyConfig {
 
     private MongoCollection<TradePairDTO> tradePairColl;
     private MongoCollection<CandleDTO> candleColl;
+    private MongoCollection<LearnDTO> learnColl;
 
     @PostConstruct
     public void init() {
@@ -57,6 +59,8 @@ public class MyConfig {
         if (!this.isIndex(candleColl, "calcCandle_1")) {
             this.candleColl.createIndex(Indexes.ascending("calcCandle"));
         }
+        
+        this.learnColl = database.getCollection("learn", LearnDTO.class);
     }
 
     @PreDestroy
@@ -90,6 +94,10 @@ public class MyConfig {
         return candleColl;
     }
 
+    public MongoCollection<LearnDTO> getLearnColl() {
+        return learnColl;
+    }
+    
     public boolean isRunProduction() {
         return runProduction;
     }
