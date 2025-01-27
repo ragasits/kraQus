@@ -16,6 +16,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import rgt.kraqus.calc.CandleDTO;
 import rgt.kraqus.get.TradePairDTO;
 import rgt.kraqus.learn.LearnDTO;
+import rgt.kraqus.model.ModelDTO;
+import rgt.kraqus.profit.ProfitDTO;
 
 /**
  *
@@ -35,6 +37,8 @@ public class MyConfig {
     private MongoCollection<TradePairDTO> tradePairColl;
     private MongoCollection<CandleDTO> candleColl;
     private MongoCollection<LearnDTO> learnColl;
+    private MongoCollection<ProfitDTO> profitColl;
+    private MongoCollection<ModelDTO> modelColl;
 
     @PostConstruct
     public void init() {
@@ -58,9 +62,15 @@ public class MyConfig {
         }
         if (!this.isIndex(candleColl, "calcCandle_1")) {
             this.candleColl.createIndex(Indexes.ascending("calcCandle"));
+
+            this.profitColl = database.getCollection("profit", ProfitDTO.class);
+            if (!this.isIndex(profitColl, "testNum_1")) {
+                this.profitColl.createIndex(Indexes.ascending("testNum"), new IndexOptions().unique(true));
+            }
         }
-        
+
         this.learnColl = database.getCollection("learn", LearnDTO.class);
+        this.modelColl = database.getCollection("model", ModelDTO.class);
     }
 
     @PreDestroy
@@ -97,7 +107,15 @@ public class MyConfig {
     public MongoCollection<LearnDTO> getLearnColl() {
         return learnColl;
     }
-    
+
+    public MongoCollection<ProfitDTO> getProfitColl() {
+        return profitColl;
+    }
+
+    public MongoCollection<ModelDTO> getModelColl() {
+        return modelColl;
+    }
+
     public boolean isRunProduction() {
         return runProduction;
     }

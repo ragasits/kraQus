@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ez="jakarta.faces.composite/ezcomp">
+
+    <h:head>
+        <title>KraQus</title>
+    </h:head>
+
+    <h:body>
+        <f:view>
+            <h:form>
+                <ez:globalMenu/>
+            </h:form>
+
+            <h:form id="form1">
+                <p:messages id="msgs" showDetail="false" >
+                    <p:autoUpdate />
+                </p:messages>
+
+                <p:blockUI block="form1" trigger="saveBtn, deleteBtn">
+                    <p:graphicImage value="/resources/ajax-loader.gif" />
+                </p:blockUI>
+
+                <p:panel>
+                    <p:panelGrid columns="10" layout="tabular">
+                        <p:outputLabel value="Model:" style="font-weight: bold"/>
+                        <p:autoComplete value="#{modelBean.selectedName}"
+                                        completeMethod="#{modelBean.complete}">
+                            <p:ajax event="itemSelect" listener="#{modelBean.onSelectedName}"
+                                    update="fileName, exportPanel, wekaPanel"/>
+                        </p:autoComplete>
+
+                        <p:commandButton value="Save"  id="saveBtn"
+                                         action="#{modelBean.onSave()}" />
+
+                        <p:commandButton value="Delete"  id="deleteBtn"
+                                         action="#{modelBean.onDelete}" />
+
+                        <p:outputLabel value="FileName:"/>
+                        <p:outputLabel value="#{modelBean.detail.modelFileName}" id="fileName"/>
+
+                        <p:commandButton value="Upload" onclick="PF('dlg').show()"/>
+
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="10" id="exportPanel" layout="tabular">
+                        <p:outputLabel value="Export:" style="font-weight: bold"/>
+                        <p:selectOneMenu value="#{modelBean.selectedExportType}" id="typeList">
+                            <f:selectItem itemLabel="-" itemValue=""/>
+                            <f:selectItems value="#{exportBean.exportTypes}"/>
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="FirstBuy:"/>
+                        <p:calendar value="#{modelBean.detail.firstBuyDate}" 
+                                    navigator="true"/>                  
+
+                        <p:outputLabel value="LastSell:"/>
+                        <p:calendar value="#{modelBean.detail.lastSellDate}" 
+                                    navigator="true"/>                  
+
+                    </p:panelGrid>
+
+                    <p:dialog widgetVar="dlg" header="Upload model">
+                        <p:fileUpload mode="advanced" multiple="false"
+                                      listener="#{modelBean.onModelFileUpload}"
+                                      update="fileName" oncomplete="PF('dlg').hide()"
+                                      />
+                    </p:dialog>
+
+                    <p:panelGrid columns="10" id="wekaPanel" layout="tabular">
+
+                        <p:outputLabel value="Remove:" style="font-weight: bold"/>
+                        <p:outputLabel value="AttributeIndices:"/>
+                        <p:inputText value="#{modelBean.detail.removeAttributeIndices}"/>
+                        <p:outputLabel value="InvertSelection:"/>
+                        <p:selectBooleanCheckbox value="#{modelBean.detail.removeInvertSelection}"/>
+
+                        <p:commandButton value="Run WEKA prediction"  id="wekaBtn"
+                                         action="#{modelBean.onRunWeka()}" />
+                    </p:panelGrid>           
+                </p:panel>
+            </h:form>
+        </f:view>                
+    </h:body>
+</html>
+
+

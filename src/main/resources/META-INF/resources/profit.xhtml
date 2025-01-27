@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ez="jakarta.faces.composite/ezcomp">
+
+    <h:head>
+        <title>KraQus</title>
+    </h:head> 
+
+    <h:body>
+        <f:view>
+            <h:form>
+                <ez:globalMenu/>
+            </h:form>
+
+            <h:form id="form1">
+                <p:panel id="headPanel">
+                    <p:panelGrid columns="10" layout="tabular">
+                        <p:outputLabel value="Learn:"/>  
+                        <p:selectOneMenu value="#{profitBean.selectedLearnName}" id="nameList">
+                            <f:selectItem itemLabel="-" itemValue=""/>
+                            <f:selectItems value="#{learnBean.learnNameList}" var="names" 
+                                           itemLabel="#{names}" itemValue="#{names}" />
+                            <p:ajax event="itemSelect" listener="#{profitBean.updateLearn()}"
+                                    update="headPanel, tbl"/>
+                        </p:selectOneMenu>                        
+                        
+                        <p:outputLabel value="TestNum:"/>  
+                        <p:selectOneMenu value="#{profitBean.selectedTestNum}" id="testNumList">
+                            <f:selectItem itemLabel="-" itemValue=""/>
+                            <f:selectItems value="#{profitBean.testNumList}"  var="nums" 
+                                           itemLabel="#{nums.testNum}" itemValue="#{nums.testNum}"/>
+                            <p:ajax event="itemSelect" update="tbl, headPanel"/>
+                        </p:selectOneMenu>  
+
+                        <p:outputLabel value="Eur:"/>  
+                        <p:outputLabel value="#{profitBean.detail.eurFormat}" id="eurValue" />  
+
+                        <p:commandButton value="Calculate"  id="calcBtn" 
+                                         action="#{profitBean.onCalc()}" 
+                                         update="tbl, headPanel" >
+                        </p:commandButton>     
+                        
+                        <p:commandButton value="Calculate all"  id="calcAllBtn" 
+                                         action="#{profitBean.onCalcAll()}" 
+                                         update="tbl, headPanel" >
+                        </p:commandButton>     
+
+                        <p:commandButton value="Delete"  id="deleteBtn" 
+                                         action="#{profitBean.onDelete()}" 
+                                         update="headPanel, tbl" >
+                        </p:commandButton>   
+                        
+                        <p:commandButton value="Delete all"  id="deleteAllBtn" 
+                                         action="#{profitBean.onDeleteAll()}" 
+                                         update="headPanel, tbl" >
+                        </p:commandButton>                           
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="6" layout="tabular">
+                        <p:outputLabel value="Buy:"/>                  
+                        <p:selectOneMenu value="#{profitBean.selectedBuyTime}" id="buyList">
+                            <f:selectItems value="#{profitBean.buyList}" var="item" 
+                                           itemLabel="#{item.startDate}" itemValue="#{item.startDate.time}" />                          
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="Sell:"/>     
+                        <p:selectOneMenu value="#{profitBean.selectedSellTime}" id="sellList">
+                            <f:selectItems value="#{profitBean.sellList}" var="item1" 
+                                           itemLabel="#{item1.startDate}" itemValue="#{item1.startDate.time}" />                          
+                        </p:selectOneMenu>          
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="6" layout="tabular">
+                        <p:outputLabel value="Strategy:"/>  
+                        <p:selectOneRadio value="#{profitBean.selectedStrategy}">
+                            <f:selectItems value="#{profitBean.strategyList}"/>
+                            <p:ajax update="tresholdInput"/>
+                        </p:selectOneRadio>
+
+                        <p:outputLabel value="Treshold%:"/>  
+                        <p:spinner value="#{profitBean.treshold}"
+                                   id="tresholdInput" min="1" 
+                                   disabled="#{profitBean.tresholdDisabled}"/>
+
+                    </p:panelGrid>
+                </p:panel>      
+
+                <p:blockUI block="form1" trigger="calcBtn, deleteBtn">
+                    <p:graphicImage value="/resources/ajax-loader.gif" />
+                </p:blockUI>    
+
+                <p:panel>    
+                    <p:dataTable value="#{profitBean.profitList}" var="item" tableStyle="width:auto" id="tbl">
+                        <p:column headerText="startDate">
+                            <p:outputLabel value="#{item.startDate}"/>
+                        </p:column>
+                        <p:column headerText="close">
+                            <p:outputLabel value="#{item.close}"/>
+                        </p:column>
+                        <p:column headerText="trade">
+                            <p:outputLabel value="#{item.trade}"/>
+                        </p:column>
+                        <p:column headerText="eur">
+                            <p:outputLabel value="#{item.eur}">
+                                <f:convertNumber maxFractionDigits="2" groupingUsed="true" />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column headerText="btc">
+                            <p:outputLabel value="#{item.btc}">
+                                <f:convertNumber maxFractionDigits="10" groupingUsed="true" />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column headerText="fee">
+                            <p:outputLabel value="#{item.fee}">
+                                <f:convertNumber maxFractionDigits="10" groupingUsed="false" />
+                            </p:outputLabel>
+                        </p:column>                        
+                    </p:dataTable>
+                </p:panel>                    
+            </h:form>
+        </f:view>                
+    </h:body>
+</html>
+
+
