@@ -83,7 +83,7 @@ public class LearnBean implements Serializable {
             CandleDTO dto = candleService.get(learn.getStartDate());
             candleBean.setSelectedIdHexa(dto.getIdHexa());
 
-            return "candleDetail?faces-redirect=true";
+            return "candle?faces-redirect=true";
         }
         return null;
     }

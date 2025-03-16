@@ -4,6 +4,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.gt;
 import static com.mongodb.client.model.Filters.gte;
 import static com.mongodb.client.model.Filters.lt;
 import static com.mongodb.client.model.Filters.lte;
@@ -52,6 +53,19 @@ public class CandleService {
     CciService cciService;
 
     /**
+     * Get all Candles
+     * @return 
+     */
+    public List<CandleDTO> get() {
+        return this.config.getCandleColl()
+                .find()
+                .sort(Sorts.ascending(STARTDATE))
+                .into(new ArrayList<>());
+
+    }
+    
+    
+    /**
      * Get one Candle by startDate
      *
      * @param startDate
@@ -74,7 +88,7 @@ public class CandleService {
                 .find(eq("_id", id))
                 .first();
     }
-    
+
     /**
      * Get Candles
      *
@@ -87,7 +101,7 @@ public class CandleService {
                 .find(and(gte(STARTDATE, first), lte(STARTDATE, last)))
                 .sort(Sorts.ascending(STARTDATE))
                 .into(new ArrayList<>());
-    }    
+    }
 
     /**
      * Get first date from the candle collection
@@ -156,7 +170,7 @@ public class CandleService {
                 .limit(limit)
                 .into(new ArrayList<>());
     }
-    
+
     /**
      * get candles last "limit" size from startDate
      *
@@ -168,6 +182,20 @@ public class CandleService {
         return config.getCandleColl()
                 .find(lt(STARTDATE, startDate))
                 .sort(Sorts.descending(STARTDATE))
+                .limit(limit)
+                .into(new ArrayList<>());
+    }
+    
+    /**
+     * Get limited Candles from startDate
+     * @param startDate
+     * @param limit
+     * @return 
+     */
+    public List<CandleDTO> geNexts(Date startDate, int limit) {
+        return config.getCandleColl()
+                .find(gt(STARTDATE, startDate))
+                .sort(Sorts.ascending(STARTDATE))
                 .limit(limit)
                 .into(new ArrayList<>());
     }    

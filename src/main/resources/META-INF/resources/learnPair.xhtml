@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ez="jakarta.faces.composite/ezcomp">
+
+    <h:head>
+        <title>kraqus</title>
+    </h:head>
+
+    <h:body>
+        <f:view>
+            <h:form>
+                <ez:globalMenu/>
+            </h:form>
+
+            <h:form id="form1">
+
+                <p:blockUI block="form1" trigger="chkBtn1">
+                    <p:graphicImage value="//resources/ajax-loader.gif" />
+                </p:blockUI>  
+
+                <p:messages id="msgs" showDetail="false" >
+                    <p:autoUpdate />
+                </p:messages>   
+
+                <p:panelGrid columns="5" layout="tabular">
+                    <p:outputLabel value="Scope:"/>  
+                    <p:spinner value="#{learnPairBean.scope}"
+                               id="scope" min="1"/>
+
+
+                    <p:outputLabel value="MinProfit%:"/>  
+                    <p:spinner value="#{learnPairBean.minProfit}"
+                               id="minProfit" min="1"/>
+
+
+                    <p:commandButton value="Generate" action="#{learnPairBean.onGenerate()}"
+                                     id="chkBtn1" update="tbl" title="Generate learnPairs"/>
+
+                </p:panelGrid>
+
+                <p:panel>
+                    <p:dataTable value="#{learnPairBean.learnList}" var="item" tableStyle="width:auto" id="tbl">
+                        <p:column headerText="buyDate">
+                            <p:commandLink value="#{item.buyDate}"/>
+                        </p:column>
+
+                        <p:column headerText="buyClose">
+                            <p:outputLabel value="#{item.buyClose}"/>
+                        </p:column>      
+
+                        <p:column headerText="sellDate">
+                            <p:commandLink value="#{item.sellDate}"/>
+                        </p:column>
+
+                        <p:column headerText="sellClose">
+                            <p:outputLabel value="#{item.sellClose}"/>
+                        </p:column>                              
+
+                        <p:column headerText="profit">
+                            <p:outputLabel value="#{item.profit}"/>
+                        </p:column>                                                      
+                    </p:dataTable>
+                </p:panel>                    
+            </h:form>
+        </f:view>
+    </h:body>
+</html>

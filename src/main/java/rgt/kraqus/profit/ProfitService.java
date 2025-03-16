@@ -58,11 +58,11 @@ public class ProfitService {
      * @return
      */
     public List<ProfitDTO> get(String learnName) {
-        return config.getProfitColl()
-                .find(eq("learnName", learnName))
-                .sort(Sorts.descending("eur"))
-                .into(new ArrayList<>());
-    }
+            return config.getProfitColl()
+                    .find(eq("learnName", learnName))
+                    .sort(Sorts.descending("eur"))
+                    .into(new ArrayList<>());
+        }
 
     /**
      * Get profit filter by testNum
