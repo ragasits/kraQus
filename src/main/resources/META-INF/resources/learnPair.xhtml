@@ -19,7 +19,7 @@
 
             <h:form id="form1">
 
-                <p:blockUI block="form1" trigger="chkBtn1">
+                <p:blockUI block="form1" trigger="chkBtn1, chkBtn2">
                     <p:graphicImage value="//resources/ajax-loader.gif" />
                 </p:blockUI>  
 
@@ -27,7 +27,7 @@
                     <p:autoUpdate />
                 </p:messages>   
 
-                <p:panelGrid columns="5" layout="tabular">
+                <p:panelGrid columns="6" layout="tabular">
                     <p:outputLabel value="Scope:"/>  
                     <p:spinner value="#{learnPairBean.scope}"
                                id="scope" min="1"/>
@@ -41,6 +41,9 @@
                     <p:commandButton value="Generate" action="#{learnPairBean.onGenerate()}"
                                      id="chkBtn1" update="tbl" title="Generate learnPairs"/>
 
+
+                    <p:commandButton value="Bests" action="#{learnPairBean.onBestLearns()}"
+                                     id="chkBtn2" update="tbl" title="Seek Best learns"/>
                 </p:panelGrid>
 
                 <p:panel>

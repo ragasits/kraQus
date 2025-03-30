@@ -20,10 +20,14 @@ public class LearnPairBean {
 
     @Inject
     private LearnPairService learnPairService;
-
+    
     public void onGenerate() {
         this.learnPairService.generate(scope, minProfit);
     }
+    
+    public void onBestLearns() {
+        this.learnPairService.bestLearns();
+    }   
 
     public Integer getMinProfit() {
         return minProfit;
@@ -44,7 +48,4 @@ public class LearnPairBean {
     public List<LearnPairDTO> getLearnList() {
         return this.learnPairService.get(1000);
     }
-    
-    
-   
 }

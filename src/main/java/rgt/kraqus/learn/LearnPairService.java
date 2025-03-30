@@ -1,7 +1,13 @@
 package rgt.kraqus.learn;
 
 import com.mongodb.BasicDBObject;
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
 import com.mongodb.client.model.Sorts;
+import static com.mongodb.client.model.Filters.gt;
+import static com.mongodb.client.model.Filters.gte;
+import static com.mongodb.client.model.Filters.lte;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.math.BigDecimal;
@@ -14,12 +20,13 @@ import rgt.kraqus.calc.CandleService;
 
 /**
  * Learn Pairs Service
+ *
  * @author rgt
  */
 @ApplicationScoped
 public class LearnPairService {
 
-    private static final String STARTDATE = "startDate";
+    private static final String BUYDATE = "buyDate";
 
     @Inject
     private MyConfig config;
@@ -29,23 +36,80 @@ public class LearnPairService {
 
     /**
      * Get limited Learn Pairs
+     *
      * @param limit
-     * @return 
+     * @return
      */
     public List<LearnPairDTO> get(int limit) {
         return config.getLearnPairlColl()
                 .find()
-                .sort(Sorts.ascending(STARTDATE))
+                .sort(Sorts.ascending(BUYDATE))
                 .limit(limit)
                 .into(new ArrayList<>());
     }
 
     /**
+     * Get the all LearnPairs Order by buyDate Desc
+     * @return 
+     */
+    public List<LearnPairDTO> get() {
+        return config.getLearnPairlColl()
+                .find()
+                .sort(Sorts.ascending(BUYDATE))
+                .into(new ArrayList<>());
+    }
+
+    /**
+     * Get LearnPairs where greater than buyDate Order by buyDate
+     * @param buytDate
+     * @return 
+     */
+    public List<LearnPairDTO> get(Date buytDate) {
+        return config.getLearnPairlColl()
+                .find(gt(BUYDATE, buytDate))
+                .sort(Sorts.ascending(BUYDATE))
+                .into(new ArrayList<>());
+    }
+
+    /**
+     * Get the first LearnPair
+     * @return 
+     */
+    private LearnPairDTO getFirst() {
+        return config.getLearnPairlColl()
+                .find()
+                .sort(Sorts.ascending(BUYDATE))
+                .first();
+    }
+
+    /**
+     * Get firsts LearnPair after the date
+     * @param date
+     * @return 
+     */
+    private LearnPairDTO getFirstAfter(Date date) {
+        return config.getLearnPairlColl()
+                .find(gte(BUYDATE, date))
+                .sort(Sorts.ascending(BUYDATE))
+                .first();
+    }
+
+    /**
      * Add one Learn Pair
-     * @param dto 
+     *
+     * @param dto
      */
     public void add(LearnPairDTO dto) {
         config.getLearnPairlColl().insertOne(dto);
+    }
+
+    /**
+     * Update LearnPair
+     * @param dto 
+     */
+    public void update(LearnPairDTO dto) {
+        config.getLearnPairlColl().replaceOne(
+                eq("_id", dto.getId()), dto);
     }
 
     /**
@@ -56,6 +120,42 @@ public class LearnPairService {
         config.getLearnPairlColl().deleteMany(document);
     }
 
+    /**
+     * We're looking for the bests buy-sell items without overlap
+     */
+    public void bestLearns() {
+        LearnPairDTO pair = this.getFirst();
+
+        while (pair != null) {
+
+            Log.info("first:" + pair.getBuyDate() + "-" + pair.getSellDate());
+
+            //Get the overlaps
+            LearnPairDTO overlap = config.getLearnPairlColl()
+                    .find(and(gte(BUYDATE, pair.getBuyDate()), lte(BUYDATE, pair.getSellDate())))
+                    .sort(Sorts.descending("profit"))
+                    .first();
+
+            Log.info("overlap:" + overlap.getBuyDate() + "-" + overlap.getSellDate());
+
+            if (overlap != null) {
+                overlap.setLearn(true);
+                this.update(overlap);
+
+                pair = this.getFirstAfter(overlap.getSellDate());
+            } else {
+                pair = null;
+            }
+
+        }
+
+    }
+
+    /**
+     * Generate buy-sell positions
+     * @param scope
+     * @param minProfitPercent 
+     */
     public void generate(int scope, int minProfitPercent) {
         //Delete all 
         this.deleteAll();
@@ -87,7 +187,7 @@ public class LearnPairService {
 
             if (minProfit.compareTo(maxProfit) == -1) {
                 //Save result
-                
+
                 learnPair.setMinProfit(minProfit);
                 learnPair.setSellDate(maxDate);
                 learnPair.setSellClose(maxClose);

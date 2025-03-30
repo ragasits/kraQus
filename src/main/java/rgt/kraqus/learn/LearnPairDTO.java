@@ -19,6 +19,8 @@ public class LearnPairDTO {
     
     private BigDecimal profit;    
     private BigDecimal minProfit;
+    
+    private boolean learn = false;
 
     public LearnPairDTO() {
     }
@@ -85,6 +87,12 @@ public class LearnPairDTO {
     public void setMinProfit(BigDecimal minProfit) {
         this.minProfit = minProfit;
     }
-    
-    
+
+    public boolean isLearn() {
+        return learn;
+    }
+
+    public void setLearn(boolean learn) {
+        this.learn = learn;
+    }
 }
