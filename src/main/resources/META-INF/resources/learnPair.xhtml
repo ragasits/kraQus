@@ -19,7 +19,7 @@
 
             <h:form id="form1">
 
-                <p:blockUI block="form1" trigger="chkBtn1, chkBtn2">
+                <p:blockUI block="form1" trigger="chkBtn1, chkBtn2, chkBtn3">
                     <p:graphicImage value="//resources/ajax-loader.gif" />
                 </p:blockUI>  
 
@@ -44,6 +44,14 @@
 
                     <p:commandButton value="Bests" action="#{learnPairBean.onBestLearns()}"
                                      id="chkBtn2" update="tbl" title="Seek Best learns"/>
+
+                    <p:outputLabel value="Learn:"/>  
+                    <p:autoComplete value="#{learnPairBean.selectedLearnName}"
+                                    completeMethod="#{learnPairBean.complete}">
+                    </p:autoComplete>
+
+                    <p:commandButton value="Save" action="#{learnPairBean.onSaveLearn()}"
+                                     id="chkBtn3" update="tbl" title="Save as learn"/>
                 </p:panelGrid>
 
                 <p:panel>
@@ -66,7 +74,11 @@
 
                         <p:column headerText="profit">
                             <p:outputLabel value="#{item.profit}"/>
-                        </p:column>                                                      
+                        </p:column>     
+
+                        <p:column headerText="learnn">
+                            <p:outputLabel value="#{item.learn}" />
+                        </p:column>
                     </p:dataTable>
                 </p:panel>                    
             </h:form>

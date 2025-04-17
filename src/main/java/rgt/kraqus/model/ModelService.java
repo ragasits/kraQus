@@ -165,4 +165,66 @@ public class ModelService {
             throw new MyException("Weka error", ex);
         }
     }
+    
+    /**
+     * Execute WEKA prediction for one candle
+     *
+     * @param model
+     * @param candle
+     * @throws MyException
+     */
+    public void runWeka(ModelDTO model, CandleDTO candle) throws MyException {
+        //Delete old learn
+        learnService.delete(model.getModelName());
+
+        //Create instance
+        Date buyDate = model.getFirstBuyDate();
+        Date sellDate = model.getLastSellDate();
+        Instances dataset = exportService.toInstances(ExportType.valueOf(model.getExportType()), buyDate, sellDate);
+
+        //Save new learn - we save only the trades (buy, sell)
+        List<CandleDTO> candleList = candleService.get(buyDate, sellDate);
+
+        //Run remove
+        if (!model.getRemoveAttributeIndices().isEmpty()) {
+            Remove remove = new Remove();
+            remove.setAttributeIndices(model.getRemoveAttributeIndices());
+            remove.setInvertSelection(model.getRemoveInvertSelection());
+            try {
+                remove.setInputFormat(dataset);
+                dataset = Filter.useFilter(dataset, remove);
+            } catch (Exception ex) {
+                throw new MyException("Weka error", ex);
+            }
+
+        }
+        dataset.setClassIndex(dataset.numAttributes() - 1);
+
+        try {
+            //Run model
+            Classifier classifier = (Classifier) SerializationHelper.read(model.getModelFileStream());
+            for (int i = 0; i < dataset.numInstances(); i++) {
+                Instance instance = dataset.instance(i);
+                double prediction = classifier.classifyInstance(instance);
+                instance.setClassValue(prediction);
+
+                String trade = instance.stringValue(instance.classIndex());
+
+                if (!trade.equals("none")) {
+                    //Add new learn
+                    //CandleDTO candle = candleList.get(i);
+                    LearnDTO dto = new LearnDTO();
+                    dto.setName(model.getModelName());
+                    dto.setStartDate(candle.getStartDate());
+                    dto.setTrade(trade);
+                    dto.setClose(candle.getClose());
+                    dto.setChkMessage(instance.toString());
+                    learnService.add(dto);
+                }
+            }
+
+        } catch (Exception ex) {
+            throw new MyException("Weka error", ex);
+        }
+    }
 }

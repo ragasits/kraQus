@@ -1,5 +1,8 @@
-+ LearnPair: GUI, Pair generation
++ learnPair: Run method only once
++ learnPair: save result to Learn 
 
+
+- Bug: Calc profit
 - Fix missing frozen trades  (Only buys without sells)
 
 - Profit: Missing last buy
