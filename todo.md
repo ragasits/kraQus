@@ -1,5 +1,4 @@
-+ learnPair: Run method only once
-+ learnPair: save result to Learn 
++ BUG: Primefaces: show ajax-loader.gif 
 
 
 - Bug: Calc profit
