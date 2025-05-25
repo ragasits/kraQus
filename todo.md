@@ -1,6 +1,8 @@
-+ BUG: Primefaces: show ajax-loader.gif 
++ Add: delete Learn (Except Első)
 
 
+
+- Delete Learn (Expect Első)
 - Bug: Calc profit
 - Fix missing frozen trades  (Only buys without sells)
 

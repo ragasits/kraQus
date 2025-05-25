@@ -1,6 +1,8 @@
 package rgt.kraqus.web;
 
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
@@ -22,20 +24,19 @@ public class LearnBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private long selectedBuyTime;
-    private long  selectedSellTime;
+    private long selectedSellTime;
     private String selectedLearn;
-    
+
     @Inject
     private LearnService learnService;
-    
+
     @Inject
     private CandleService candleService;
-    
+
     @Inject
     private CandleBean candleBean;
 
-
-    public void updateLists(){
+    public void updateLists() {
         this.selectedBuyTime = learnService.getFirst(this.selectedLearn).getStartDate().getTime();
         this.selectedSellTime = learnService.getLast(this.selectedLearn).getStartDate().getTime();
     }
@@ -43,10 +44,10 @@ public class LearnBean implements Serializable {
     /**
      * Get all Learn
      *
-     * @return 
+     * @return
      */
     public List<LearnDTO> getLearnList() {
-        if (this.selectedLearn!=null){
+        if (this.selectedLearn != null) {
             return learnService.get(this.selectedLearn);
         }
         return Collections.emptyList();
@@ -55,12 +56,12 @@ public class LearnBean implements Serializable {
     /**
      * Get Names (Distinct)
      *
-     * @return 
+     * @return
      */
     public List<String> getLearnNameList() {
         return learnService.getNames();
     }
-    
+
     public String getSelectedLearn() {
         return selectedLearn;
     }
@@ -73,7 +74,7 @@ public class LearnBean implements Serializable {
      * Link to candleDetail
      *
      * @param learn
-     * @return 
+     * @return
      */
     public String showDetail(LearnDTO learn) {
 
@@ -88,6 +89,20 @@ public class LearnBean implements Serializable {
         return null;
     }
 
+    /**
+     * Delete Learn
+     */
+    public void onDelete() {
+        if (selectedLearn.isEmpty()){
+            this.addErrorMsg("Not selected Learn");
+        } else if (selectedLearn.equals("Első")) {
+            this.addErrorMsg("Not a llowe to delete: Első");
+        } else {
+            learnService.delete(selectedLearn);
+            this.addInfoMsg("Delete OK: "+selectedLearn);
+        }
+    }
+
     //Check1
     public void chkLearnPeaks() {
         learnService.chkLearnPeaks();
@@ -99,14 +114,14 @@ public class LearnBean implements Serializable {
     }
 
     public List<LearnDTO> getBuyList() {
-        if (this.selectedLearn!=null){
+        if (this.selectedLearn != null) {
             return learnService.getBuy(this.selectedLearn);
         }
         return Collections.emptyList();
     }
 
     public List<LearnDTO> getSellList() {
-        if (this.selectedLearn!=null){
+        if (this.selectedLearn != null) {
             return learnService.getSell(this.selectedLearn);
         }
         return Collections.emptyList();
@@ -127,4 +142,21 @@ public class LearnBean implements Serializable {
     public void setSelectedSellTime(long selectedSellTime) {
         this.selectedSellTime = selectedSellTime;
     }
+
+    /**
+     * Add message: Info
+     * @param msg 
+     */
+    private void addInfoMsg(String msg) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
+    }
+    
+    /**
+     * Add message: Error
+     * @param msg 
+     */
+    private void addErrorMsg(String msg) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
+    }    
+
 }
