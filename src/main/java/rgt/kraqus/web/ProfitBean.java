@@ -5,6 +5,7 @@ import java.util.List;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import java.util.Calendar;
 import java.util.Date;
 import rgt.kraqus.learn.LearnDTO;
 import rgt.kraqus.learn.LearnService;
@@ -48,6 +49,21 @@ public class ProfitBean implements Serializable {
             return profitService.get(detail.getLearnName());
         }
         return null;
+    }
+    
+    /**
+     * Set the selected Buy,Sell dates
+     */
+    public void onThisYear(){
+        
+        //Get first element of current year
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        String learnName = this.detail.getLearnName();
+        
+        
+        this.detail.setBuyDate(learnService.getThisYearBuy(learnName, year));
+        this.detail.setSellDate(learnService.getThisYearSell(learnName, year));
     }
 
     /**

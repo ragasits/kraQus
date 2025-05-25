@@ -21,7 +21,7 @@
             <h:form id="form1">
                 <p:panel id="headPanel">
                     <p:panelGrid columns="10" layout="tabular">
-                        <p:outputLabel value="Learn:"/>  
+                        <p:outputLabel value="Learn:" style="font-weight: bold"/>  
                         <p:selectOneMenu value="#{profitBean.selectedLearnName}" id="nameList">
                             <f:selectItem itemLabel="-" itemValue=""/>
                             <f:selectItems value="#{learnBean.learnNameList}" var="names" 
@@ -29,8 +29,8 @@
                             <p:ajax event="itemSelect" listener="#{profitBean.updateLearn()}"
                                     update="headPanel, tbl"/>
                         </p:selectOneMenu>                        
-                        
-                        <p:outputLabel value="TestNum:"/>  
+
+                        <p:outputLabel value="TestNum:" style="font-weight: bold"/>  
                         <p:selectOneMenu value="#{profitBean.selectedTestNum}" id="testNumList">
                             <f:selectItem itemLabel="-" itemValue=""/>
                             <f:selectItems value="#{profitBean.testNumList}"  var="nums" 
@@ -38,14 +38,14 @@
                             <p:ajax event="itemSelect" update="tbl, headPanel"/>
                         </p:selectOneMenu>  
 
-                        <p:outputLabel value="Eur:"/>  
+                        <p:outputLabel value="Eur:" style="font-weight: bold"/>  
                         <p:outputLabel value="#{profitBean.detail.eurFormat}" id="eurValue" />  
 
                         <p:commandButton value="Calculate"  id="calcBtn" 
                                          action="#{profitBean.onCalc()}" 
                                          update="tbl, headPanel" >
                         </p:commandButton>     
-                        
+
                         <p:commandButton value="Calculate all"  id="calcAllBtn" 
                                          action="#{profitBean.onCalcAll()}" 
                                          update="tbl, headPanel" >
@@ -55,7 +55,7 @@
                                          action="#{profitBean.onDelete()}" 
                                          update="headPanel, tbl" >
                         </p:commandButton>   
-                        
+
                         <p:commandButton value="Delete all"  id="deleteAllBtn" 
                                          action="#{profitBean.onDeleteAll()}" 
                                          update="headPanel, tbl" >
@@ -63,27 +63,33 @@
                     </p:panelGrid>
 
                     <p:panelGrid columns="6" layout="tabular">
-                        <p:outputLabel value="Buy:"/>                  
+                        <p:outputLabel value="Buy:" style="font-weight: bold"/>                  
                         <p:selectOneMenu value="#{profitBean.selectedBuyTime}" id="buyList">
                             <f:selectItems value="#{profitBean.buyList}" var="item" 
                                            itemLabel="#{item.startDate}" itemValue="#{item.startDate.time}" />                          
                         </p:selectOneMenu>
 
-                        <p:outputLabel value="Sell:"/>     
+                        <p:outputLabel value="Sell:" style="font-weight: bold"/>     
                         <p:selectOneMenu value="#{profitBean.selectedSellTime}" id="sellList">
                             <f:selectItems value="#{profitBean.sellList}" var="item1" 
                                            itemLabel="#{item1.startDate}" itemValue="#{item1.startDate.time}" />                          
                         </p:selectOneMenu>          
+
+                        <p:commandButton value="this.Year"  id="thisYearbtnn" 
+                                         action="#{profitBean.onThisYear()}" 
+                                         update="buyList, sellList" >
+                        </p:commandButton>                           
+
                     </p:panelGrid>
 
                     <p:panelGrid columns="6" layout="tabular">
-                        <p:outputLabel value="Strategy:"/>  
+                        <p:outputLabel value="Strategy:" style="font-weight: bold"/>  
                         <p:selectOneRadio value="#{profitBean.selectedStrategy}">
                             <f:selectItems value="#{profitBean.strategyList}"/>
                             <p:ajax update="tresholdInput"/>
                         </p:selectOneRadio>
 
-                        <p:outputLabel value="Treshold%:"/>  
+                        <p:outputLabel value="Treshold%:" style="font-weight: bold"/>  
                         <p:spinner value="#{profitBean.treshold}"
                                    id="tresholdInput" min="1" 
                                    disabled="#{profitBean.tresholdDisabled}"/>

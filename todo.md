@@ -1,5 +1,4 @@
-+ Add: delete Learn (Except Első)
-
++ Add: profit: set sell, buy dates in one click: First buy this year, last sell last month
 
 
 - Delete Learn (Expect Első)

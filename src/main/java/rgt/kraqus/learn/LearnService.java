@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.util.Calendar;
 import rgt.kraqus.MyConfig;
 import rgt.kraqus.calc.CandleDTO;
 import rgt.kraqus.calc.CandleService;
@@ -142,6 +143,62 @@ public class LearnService {
                 .find(eq(TRADE, "buy"))
                 .sort(Sorts.ascending(STARTDATE))
                 .into(new ArrayList<>());
+    }
+
+    /**
+     * Get the last startDate from the last month
+     * @param learnName
+     * @param year
+     * @return 
+     */
+    public Date getThisYearSell(String learnName, int year) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date date = cal.getTime();
+
+        LearnDTO learn = config.getLearnColl()
+                .find(
+                        and(
+                                eq(LEARNNAME, learnName),
+                                eq(TRADE, "sell"),
+                                lt(STARTDATE, date)
+                        )
+                )
+                .sort(Sorts.descending(STARTDATE))
+                .first();
+
+        return learn.getStartDate();
+
+    }
+
+    /**
+     * Get the first startDate from this year
+     * @param learnName
+     * @param year
+     * @return 
+     */
+    public Date getThisYearBuy(String learnName, int year) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, 0, 1, 0, 0, 0);
+        Date date = cal.getTime();
+
+
+        LearnDTO learn = config.getLearnColl()
+                .find(
+                        and(
+                                eq(LEARNNAME, learnName),
+                                eq(TRADE, "buy"),
+                                gte(STARTDATE, date)
+                        )
+                )
+                .sort(Sorts.ascending(STARTDATE))
+                .first();
+
+        return learn.getStartDate();
+
     }
 
     /**
@@ -295,6 +352,7 @@ public class LearnService {
 
     /**
      * Looking for wrong learn pairs
+     *
      * @param learnName
      */
     public void chkLearnPairs(String learnName) {
