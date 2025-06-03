@@ -200,6 +200,44 @@ public class LearnService {
         return learn.getStartDate();
 
     }
+    
+    /**
+     * Get the first 'buy' trade start date that is at least one year and one month earlier from current date.
+     * 
+     * This method calculates a date by subtracting one year and one month from the current date,
+     * then finds the earliest 'buy' trade on or after this calculated date for the specified learnName.
+     *
+     * @param learnName the name identifier for the learn
+     * @return the start date of the first 'buy' trade after the calculated date
+     */
+    public Date getLastYearBuy(String learnName) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.YEAR, -1);    // Subtract 1 year
+        cal.add(Calendar.MONTH, -1);   // Subtract 1 month
+        
+        // Reset day and time fields
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date date = cal.getTime();
+
+
+        LearnDTO learn = config.getLearnColl()
+                .find(
+                        and(
+                                eq(LEARNNAME, learnName),
+                                eq(TRADE, "buy"),
+                                gte(STARTDATE, date)
+                        )
+                )
+                .sort(Sorts.ascending(STARTDATE))
+                .first();
+
+        return learn.getStartDate();
+
+    }    
 
     /**
      * Get Buys by learnName

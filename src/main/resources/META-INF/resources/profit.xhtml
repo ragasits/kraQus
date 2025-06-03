@@ -59,7 +59,8 @@
                         <p:commandButton value="Delete all"  id="deleteAllBtn" 
                                          action="#{profitBean.onDeleteAll()}" 
                                          update="headPanel, tbl" >
-                        </p:commandButton>                           
+                        </p:commandButton>   
+
                     </p:panelGrid>
 
                     <p:panelGrid columns="6" layout="tabular">
@@ -75,10 +76,12 @@
                                            itemLabel="#{item1.startDate}" itemValue="#{item1.startDate.time}" />                          
                         </p:selectOneMenu>          
 
-                        <p:commandButton value="this.Year"  id="thisYearbtnn" 
+                        <p:commandButton value="this.Year"  id="thisYearbtn" 
                                          action="#{profitBean.onThisYear()}" 
                                          update="buyList, sellList" >
-                        </p:commandButton>                           
+                        </p:commandButton>
+                        
+                        <p:commandButton value="LastYear" id="newButton" update="buyList, sellList" action="#{profitBean.onLastYear()}"/>                        
 
                     </p:panelGrid>
 

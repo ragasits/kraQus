@@ -50,18 +50,32 @@ public class ProfitBean implements Serializable {
         }
         return null;
     }
-    
+
     /**
-     * Set the selected Buy,Sell dates
+     * Sets buy date to one year before last year's sell date for the current
+     * learnName without changing the sell date.
      */
-    public void onThisYear(){
-        
+    public void onLastYear() {
         //Get first element of current year
         Calendar cal = Calendar.getInstance();
         int year = cal.get(Calendar.YEAR);
         String learnName = this.detail.getLearnName();
-        
-        
+        this.detail.setSellDate(learnService.getThisYearSell(learnName, year));
+
+        this.detail.setBuyDate(learnService.getLastYearBuy(learnName));
+
+    }
+
+    /**
+     * Set the selected Buy,Sell dates
+     */
+    public void onThisYear() {
+
+        //Get first element of current year
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        String learnName = this.detail.getLearnName();
+
         this.detail.setBuyDate(learnService.getThisYearBuy(learnName, year));
         this.detail.setSellDate(learnService.getThisYearSell(learnName, year));
     }

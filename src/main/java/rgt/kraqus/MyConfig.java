@@ -6,6 +6,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import io.quarkus.logging.Log;
 import io.quarkus.runtime.Startup;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -94,11 +95,16 @@ public class MyConfig {
      * @return
      */
     private boolean isIndex(MongoCollection collection, String indexName) {
-        MongoCursor<Document> indexes = collection.listIndexes().iterator();
-        while (indexes.hasNext()) {
-            Document index = indexes.next();
-            if (indexName.equals(index.getString("name"))) {
-                return true;
+        MongoCursor<?> cursor = collection.listIndexes().iterator();
+        while (cursor.hasNext()) {
+            Object item = cursor.next();
+            if (item instanceof Document) {
+                Document index = (Document) item;
+                if (indexName.equals(index.getString("name"))) {
+                    return true;
+                }
+            } else {
+                Log.error("Unexpected type in index list: " + item.getClass().getName());
             }
         }
         return false;
