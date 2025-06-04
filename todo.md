@@ -1,4 +1,4 @@
-+ Add: profit: set sell, buy dates in one click: From the last year
++ Fix ExportBean.onExport NullPointerException: Cannot invoke "String.concat(String)" because the return value of "jakarta.servlet.ServletContext.getRealPath(String)" is null
 
 - Bug: Calc profit
 - Fix missing frozen trades  (Only buys without sells)

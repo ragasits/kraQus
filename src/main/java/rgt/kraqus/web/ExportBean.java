@@ -5,7 +5,6 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.servlet.ServletContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
@@ -120,11 +119,9 @@ public class ExportBean implements Serializable {
         }
 
         String filename = this.getSelectedExportType().toString() + "." + type;
-        ServletContext ctx = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
-        String realPath = ctx.getRealPath("/WEB-INF/").concat("/").concat(filename);
 
         AbstractFileSaver saver;
-
+        File tempFile = null;
         try {
             if (type.equals("arff")) {
                 saver = new ArffSaver();
@@ -132,19 +129,30 @@ public class ExportBean implements Serializable {
                 saver = new CSVSaver();
             }
 
+            // Create temp file with correct suffix
+            tempFile = File.createTempFile("export-", "." + type);
             saver.setInstances(instances);
-            saver.setFile(new File(realPath));
+            saver.setFile(tempFile);
             saver.writeBatch();
+
+            final File fileToServe = tempFile;  // For lambda usage
+
+            this.file = DefaultStreamedContent.builder()
+                    .name(filename)
+                    .contentType("application/octet-stream")
+                    .stream(() -> {
+                        try {
+                            return new FileInputStream(fileToServe);
+                        } catch (FileNotFoundException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    })
+                    .build();
+
         } catch (IOException iOException) {
             this.addMsg("Error: " + iOException.getMessage());
             return;
         }
-
-        this.file = DefaultStreamedContent.builder()
-                .name(filename)
-                .contentType("application/csv")
-                .stream(() -> FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/WEB-INF/" + filename))
-                .build();
     }
 
     public StreamedContent getFile() {
