@@ -4,8 +4,10 @@ import io.quarkus.logging.Log;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import rgt.kraqus.MyConfig;
 import rgt.kraqus.MyException;
@@ -130,5 +132,51 @@ public class ProdService {
             last = tradeService.getLastValue();
             lastTime = Long.parseLong(last.substring(0, 13));
         }
+    }
+
+    /**
+     * Delete the old candles and regenerate all candles from first to last
+     * trade date.
+     */
+    public void regenerateAllCandles() throws MyException {
+        config.setRunProduction(false);
+
+        Log.info("RegenerateAllCandles: start");
+
+        // Delete all existing candles
+        config.getCandleColl().deleteMany(new org.bson.Document());
+
+        // Determine the start date
+        Date startDate = candleService.getStartDate();
+
+        // Determine the stop date from the last trade
+        TradePairDTO lastTrade = tradeService.getLast();
+        if (lastTrade == null || lastTrade.getTimeDate() == null) {
+            throw new MyException("Empty trade collection or invalid last trade date");
+        }
+        Date stopDate = lastTrade.getTimeDate();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+        List<CandleDTO> candleList = new ArrayList<>();
+
+        while (startDate.getTime() <= stopDate.getTime()) {
+            candleList.add(new CandleDTO(startDate));
+
+            cal.setTime(startDate);
+            cal.add(Calendar.MINUTE, 30);
+            startDate = cal.getTime();
+
+        }
+
+        config.getCandleColl().insertMany(candleList);
+        Log.info("RegenerateAllCandles: Candle generations done");
+
+        //Fill candles
+        candleService.callCandleProd();
+
+        Log.info("RegenerateAllCandles: done");
+        config.setRunProduction(true);
+
     }
 }

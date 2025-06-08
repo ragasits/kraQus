@@ -15,15 +15,35 @@
         <f:view>
             <h:form id="form1">
                 <ez:globalMenu/>
+                
+                <p:blockUI block="form1" trigger="reCanleBtn">
+                    <p:graphicImage value="/ajax-loader.gif" />
+                </p:blockUI>                  
+
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" />
+                </p:confirmDialog>                    
+
+                <p:messages id="msgs" showDetail="false" >
+                    <p:autoUpdate />
+                </p:messages>        
+
+                <p:panel>
+                    <p:commandButton id="reCanleBtn" value="Regenerate All Candles" action="#{indexBean.onRegenerateCandle}" update="form1">
+                        <p:confirm header="Confirmation" message="Do you want to execute?" icon="pi pi-info-circle"/>
+                    </p:commandButton>                    
+                </p:panel>
 
                 <p:panel header="Params">
                     <p:panelGrid columns="10" layout="tabular">
                         <p:outputLabel value="kraqus.runProduction:"/>
                         <p:selectBooleanCheckbox value="#{indexBean.runProduction}" disabled="true"/>
-                        
-                         <p:outputLabel value="cron.expr:"/>
+
+                        <p:outputLabel value="cron.expr:"/>
                     </p:panelGrid>                    
                 </p:panel>
+
 
                 <p:panel header="Stats">
                     <p:panelGrid columns="3" layout="tabular">
@@ -38,7 +58,7 @@
 
                         <p:outputLabel value="Candle" style="font-weight: bold"/>
                         <p:outputLabel value="#{indexBean.firstCandleDate}"/>
-                        <p:outputLabel value="#{indexBean.lasttCandleDate}"/>                        
+                        <p:outputLabel value="#{indexBean.lastCandleDate}"/>                        
 
                     </p:panelGrid>
                 </p:panel>

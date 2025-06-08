@@ -1,4 +1,4 @@
-+ Fix ExportBean.onExport NullPointerException: Cannot invoke "String.concat(String)" because the return value of "jakarta.servlet.ServletContext.getRealPath(String)" is null
++ Add async candle regeneration with UI integration and fix naming/refactor IndexBean and ProdService
 
 - Bug: Calc profit
 - Fix missing frozen trades  (Only buys without sells)
