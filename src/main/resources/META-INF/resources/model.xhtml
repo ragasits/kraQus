@@ -17,7 +17,7 @@
                 <ez:globalMenu/>
             </h:form>
 
-            <h:form id="form1">
+            <h:form id="form1" enctype="multipart/form-data">
                 <p:messages id="msgs" showDetail="false" >
                     <p:autoUpdate />
                 </p:messages>
@@ -40,12 +40,6 @@
 
                         <p:commandButton value="Delete"  id="deleteBtn"
                                          action="#{modelBean.onDelete}" />
-
-                        <p:outputLabel value="FileName:"/>
-                        <p:outputLabel value="#{modelBean.detail.modelFileName}" id="fileName"/>
-
-                        <p:commandButton value="Upload" onclick="PF('dlg').show()"/>
-
                     </p:panelGrid>
 
                     <p:panelGrid columns="10" id="exportPanel" layout="tabular">
@@ -65,12 +59,6 @@
 
                     </p:panelGrid>
 
-                    <p:dialog widgetVar="dlg" header="Upload model">
-                        <p:fileUpload mode="advanced" multiple="false"
-                                      listener="#{modelBean.onModelFileUpload}"
-                                      update="fileName" oncomplete="PF('dlg').hide()"
-                                      />
-                    </p:dialog>
 
                     <p:panelGrid columns="10" id="wekaPanel" layout="tabular">
 

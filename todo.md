@@ -1,4 +1,6 @@
-+ Add async candle regeneration with UI integration and fix naming/refactor IndexBean and ProdService
++ Load model from a specified folder (instead mongoDb), delete unused parts from the code
++ Add Calculating Average True Range dto (not implemented yet)
++ Migrate to Java21
 
 - Bug: Calc profit
 - Fix missing frozen trades  (Only buys without sells)

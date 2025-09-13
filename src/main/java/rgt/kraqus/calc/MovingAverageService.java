@@ -22,6 +22,8 @@ import rgt.kraqus.MyConfig;
 @ApplicationScoped
 public class MovingAverageService {
 
+    private static final String STARTDATE = "startDate";
+
     @Inject
     MyConfig config;
 
@@ -35,7 +37,7 @@ public class MovingAverageService {
         //Get the candles
         candleList = config.getCandleColl()
                 .find(and(eq("calcCandle", true), eq("movingAverage.calcMovingAverage", false)))
-                .sort(Sorts.ascending("startDate"))
+                .sort(Sorts.ascending(STARTDATE))
                 .into(new ArrayList<>());
 
         for (CandleDTO candle : candleList) {
@@ -67,8 +69,8 @@ public class MovingAverageService {
 
         //Get the candles
         List<CandleDTO> candleList = config.getCandleColl()
-                .find(lte("startDate", dto.getStartDate()))
-                .sort(Sorts.descending("startDate"))
+                .find(lte(STARTDATE, dto.getStartDate()))
+                .sort(Sorts.descending(STARTDATE))
                 .limit(limit)
                 .into(new ArrayList<>());
 
@@ -102,8 +104,8 @@ public class MovingAverageService {
     public BigDecimal calcEMA(CandleDTO dto, int limit, boolean isClose) {
 
         List<CandleDTO> candleList = config.getCandleColl()
-                .find(lte("startDate", dto.getStartDate()))
-                .sort(Sorts.descending("startDate"))
+                .find(lte(STARTDATE, dto.getStartDate()))
+                .sort(Sorts.descending(STARTDATE))
                 .limit(limit)
                 .into(new ArrayList<>());
 
@@ -111,8 +113,8 @@ public class MovingAverageService {
 
             //get previous
             CandleDTO prev = config.getCandleColl()
-                    .find(lt("startDate", dto.getStartDate()))
-                    .sort(Sorts.descending("startDate"))
+                    .find(lt(STARTDATE, dto.getStartDate()))
+                    .sort(Sorts.descending(STARTDATE))
                     .first();
 
             if (isClose) {

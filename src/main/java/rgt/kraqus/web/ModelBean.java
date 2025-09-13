@@ -75,18 +75,6 @@ public class ModelBean implements Serializable {
         }
     }
 
-    /**
-     * Upload model file
-     *
-     * @param event
-     */
-    public void onModelFileUpload(FileUploadEvent event) {
-        UploadedFile file = event.getFile();
-        org.bson.types.Binary bin = new Binary(file.getContent());
-        detail.setModelFile(bin);
-        detail.setModelFileName(file.getFileName());
-    }
-
     public String getSelectedName() {
         if (this.detail != null) {
             return this.detail.getModelName();

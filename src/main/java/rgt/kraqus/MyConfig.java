@@ -30,6 +30,10 @@ import rgt.kraqus.profit.ProfitDTO;
 public class MyConfig {
 
     @Inject
+    @ConfigProperty(name = "kraqus.model.dir", defaultValue = "/home/rgt/0dev/jakarta.ee/kraQus/model")
+    private String modelDir;
+
+    @Inject
     private MongoClient mongoClient;
 
     @Inject
@@ -140,6 +144,10 @@ public class MyConfig {
 
     public void setRunProduction(boolean runProduction) {
         this.runProduction = runProduction;
+    }
+
+    public String getModelDir() {
+        return modelDir;
     }
 
 }

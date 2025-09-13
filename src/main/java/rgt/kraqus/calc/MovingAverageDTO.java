@@ -26,16 +26,12 @@ public class MovingAverageDTO {
      * @return
      */
     public BigDecimal getEMA(int limit) {
-        switch (limit) {
-            case 9:
-                return this.ema9;
-            case 12:
-                return this.ema12;
-            case 26:
-                return this.ema26;
-            default:
-                return BigDecimal.ZERO;
-        }
+        return switch (limit) {
+            case 9 -> this.ema9;
+            case 12 -> this.ema12;
+            case 26 -> this.ema26;
+            default -> BigDecimal.ZERO;
+        };
     }
 
     public boolean isCalcMovingAverage() {
@@ -77,5 +73,4 @@ public class MovingAverageDTO {
     public void setEma26(BigDecimal ema26) {
         this.ema26 = ema26;
     }
-
 }

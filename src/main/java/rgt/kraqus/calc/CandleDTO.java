@@ -36,6 +36,7 @@ public class CandleDTO {
     private RsiDTO rsi;
     private MacdDTO macd;
     private CciDTO cci;
+    private AtrDTO atr;
 
     public CandleDTO() {
     }
@@ -63,6 +64,7 @@ public class CandleDTO {
         this.movingAverage = new MovingAverageDTO();
         this.macd = new MacdDTO();
         this.cci = new CciDTO();
+        this.atr = new AtrDTO();
     }
 
     /**
@@ -272,4 +274,14 @@ public class CandleDTO {
     public void setCci(CciDTO cci) {
         this.cci = cci;
     }
+
+    public AtrDTO getAtr() {
+        return atr;
+    }
+
+    public void setAtr(AtrDTO atr) {
+        this.atr = atr;
+    }
+    
+    
 }

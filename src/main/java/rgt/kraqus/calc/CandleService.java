@@ -47,6 +47,9 @@ public class CandleService {
     RsiService rsiService;
 
     @Inject
+    AtrService atrService;
+
+    @Inject
     MacdService macdService;
 
     @Inject
@@ -340,6 +343,7 @@ public class CandleService {
         rsiService.calculateRsi();
         macdService.calculateMacd();
         cciService.calculateCci();
+        atrService.calculateAtr();        
     }
 
     /**

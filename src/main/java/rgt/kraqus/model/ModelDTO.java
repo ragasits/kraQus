@@ -1,10 +1,6 @@
 package rgt.kraqus.model;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.Date;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 
 public class ModelDTO {
@@ -12,7 +8,6 @@ public class ModelDTO {
     private ObjectId id;
 
     private String modelName;
-    private Binary modelFile;
 
     private String modelFileName;
 
@@ -38,19 +33,6 @@ public class ModelDTO {
 
     public void setModelName(String modelName) {
         this.modelName = modelName;
-    }
-
-    public Binary getModelFile() {
-        return modelFile;
-    }
-
-    public void setModelFile(Binary modelFile) {
-        this.modelFile = modelFile;
-    }
-
-    @BsonIgnore
-    public InputStream getModelFileStream() {
-        return new ByteArrayInputStream(this.getModelFile().getData());
     }
 
     public String getModelFileName() {
