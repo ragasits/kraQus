@@ -57,7 +57,8 @@ public class CandleService {
 
     /**
      * Get all Candles
-     * @return 
+     *
+     * @return
      */
     public List<CandleDTO> get() {
         return this.config.getCandleColl()
@@ -66,8 +67,7 @@ public class CandleService {
                 .into(new ArrayList<>());
 
     }
-    
-    
+
     /**
      * Get one Candle by startDate
      *
@@ -188,20 +188,34 @@ public class CandleService {
                 .limit(limit)
                 .into(new ArrayList<>());
     }
-    
+
     /**
      * Get limited Candles from startDate
+     *
      * @param startDate
      * @param limit
-     * @return 
+     * @return
      */
-    public List<CandleDTO> geNexts(Date startDate, int limit) {
+    public List<CandleDTO> getNexts(Date startDate, int limit) {
         return config.getCandleColl()
                 .find(gt(STARTDATE, startDate))
                 .sort(Sorts.ascending(STARTDATE))
                 .limit(limit)
                 .into(new ArrayList<>());
-    }    
+    }
+
+    /**
+     * Get limited Candles from startDate
+     *
+     * @param startDate
+     * @return
+     */
+    public List<CandleDTO> getNexts(Date startDate) {
+        return config.getCandleColl()
+                .find(gt(STARTDATE, startDate))
+                .sort(Sorts.ascending(STARTDATE))
+                .into(new ArrayList<>());
+    }
 
     /**
      * Delete the last candle
@@ -343,7 +357,7 @@ public class CandleService {
         rsiService.calculateRsi();
         macdService.calculateMacd();
         cciService.calculateCci();
-        atrService.calculateAtr();        
+        atrService.calculateAtr();
     }
 
     /**

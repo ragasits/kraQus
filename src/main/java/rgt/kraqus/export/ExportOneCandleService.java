@@ -21,13 +21,13 @@ import weka.core.Instances;
  */
 @ApplicationScoped
 public class ExportOneCandleService {
-    
+
     @Inject
     private LearnService learnService;
-    
+
     @Inject
     private CandleService candleService;
-    
+
     /**
      * Add learning data
      *
@@ -42,9 +42,10 @@ public class ExportOneCandleService {
         }
         return trade;
     }
-    
+
     /**
      * Convert predicted trade value to nominal
+     *
      * @param trade
      * @return
      */
@@ -247,6 +248,22 @@ public class ExportOneCandleService {
     }
 
     /**
+     * Create ARFF relation message
+     * @param exportType
+     * @param candle
+     * @return 
+     */
+    private String getRelation(ExportType exportType, CandleDTO candle) {
+        StringBuilder sb = new StringBuilder();
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddkkmm");
+
+        return sb.append(exportType.toString())
+                .append("-")
+                .append(df.format(candle.getStartDate()))
+                .toString();
+    }
+
+    /**
      * Create weka instance
      *
      * @param learnName
@@ -294,6 +311,27 @@ public class ExportOneCandleService {
             instance.setMissing(instances.attribute("trade"));
             instances.add(instance);
         }
+
+        instances.setClassIndex(instances.attribute("trade").index());
+        return instances;
+    }
+
+    /**
+     * Convert a single candle to WEKA Instances for prediction.
+     *
+     * @param exportType Export type for attribution.
+     * @param candle Candle data to convert.
+     * @return WEKA Instances object with one instance.
+     */
+    public Instances toInstances(ExportType exportType, CandleDTO candle) {
+
+        ArrayList<Attribute> attributes = this.getAttributes();
+        Instances instances = new Instances(this.getRelation(exportType, candle), attributes, 0);
+
+        DenseInstance instance = this.getValues(candle, instances);
+        //Set empty trade
+        instance.setMissing(instances.attribute("trade"));
+        instances.add(instance);
 
         instances.setClassIndex(instances.attribute("trade").index());
         return instances;

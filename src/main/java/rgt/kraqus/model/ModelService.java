@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.Date;
@@ -106,11 +107,14 @@ public class ModelService {
     }
 
     /**
-     * Load a WEKA Classifier model from the file system based on the model information.
+     * Load a WEKA Classifier model from the file system based on the model
+     * information.
      *
-     * @param model The ModelDTO containing model metadata used to locate the model file.
+     * @param model The ModelDTO containing model metadata used to locate the
+     * model file.
      * @return An instance of WEKA Classifier deserialized from the model file.
-     * @throws MyException if the model file cannot be found, read, or deserialized correctly.
+     * @throws MyException if the model file cannot be found, read, or
+     * deserialized correctly.
      */
     private Classifier loadModelFromFile(ModelDTO model) throws MyException {
         String filePath = config.getModelDir() + "/" + model.getModelName() + ".model";
@@ -172,7 +176,6 @@ public class ModelService {
                     dto.setStartDate(candle.getStartDate());
                     dto.setTrade(trade);
                     dto.setClose(candle.getClose());
-                    //dto.setChkMessage(instance.toString());
                     learnService.add(dto);
                 }
             }
@@ -181,5 +184,56 @@ public class ModelService {
             throw new MyException("Weka error - prediction", ex);
         }
     }
- 
+
+    /**
+     * Execute WEKA prediction for one candle
+     *
+     * @param model
+     * @throws MyException
+     */
+    public void runWekaOneCandle(ModelDTO model, CandleDTO candle) throws MyException {
+
+        //Create instance
+        Instances dataset = exportService.toInstances(ExportType.valueOf(model.getExportType()), candle);
+
+        //Run remove
+        if (!model.getRemoveAttributeIndices().isEmpty()) {
+            Remove remove = new Remove();
+            remove.setAttributeIndices(model.getRemoveAttributeIndices());
+            remove.setInvertSelection(model.getRemoveInvertSelection());
+            try {
+                remove.setInputFormat(dataset);
+                dataset = Filter.useFilter(dataset, remove);
+            } catch (Exception ex) {
+                throw new MyException("Weka error - remove", ex);
+            }
+
+        }
+        dataset.setClassIndex(dataset.numAttributes() - 1);
+
+        try {
+            //Run model
+            Classifier classifier = this.loadModelFromFile(model);
+            Instance instance = dataset.instance(0);
+            double prediction = classifier.classifyInstance(instance);
+            instance.setClassValue(prediction);
+
+            String trade = instance.stringValue(instance.classIndex());
+
+            if (!trade.equals("none")) {
+                //Add new learn
+                LearnDTO dto = new LearnDTO();
+                dto.setName(model.getModelName());
+                dto.setStartDate(candle.getStartDate());
+                dto.setTrade(trade);
+                dto.setClose(candle.getClose());
+                learnService.add(dto);
+
+                Log.info("runWekaOneCandle: " + candle.getStartDate() + ":" + trade);
+            }
+        } catch (Exception ex) {
+            throw new MyException("Weka error - prediction", ex);
+        }
+    }
+
 }

@@ -1,54 +1,80 @@
 # kraQus
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+## Overview
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+kraQus is a Quarkus-based Java application designed for financial trading analysis and strategy simulation.
 
-## Running the application in dev mode
+The system utilizes historical market data, computes various technical indicators, applies machine learning models to generate trade signals, and simulates trading strategies to evaluate profit and loss.
 
-You can run your application in dev mode that enables live coding using:
+## Features
 
-```shell script
+- Calculation of popular trading indicators such as Moving Averages, RSI, MACD, Bollinger Bands, and more.
+- Integration with MongoDB for storage and retrieval of market data, learning signals, and profit simulations.
+- Use of WEKA machine learning models for trade signal prediction.
+- Implementation of multiple profit calculation and backtesting strategies.
+- Configuration managed through Quarkus and support for both JVM and native builds.
+
+## Getting Started
+
+### Prerequisites
+
+- Java 11 or later
+- Maven 3.x
+- MongoDB instance
+
+### Running the Application
+
+1. Clone the repository:
+
+```
+git clone https://github.com/ragasits/kraQus.git
+cd kraQus
+```
+
+2. Configure database connection and settings in the application configuration or via `MyConfig`.
+
+3. Run in development mode:
+
+```
 ./mvnw quarkus:dev
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+The dev UI is available at `http://localhost:8080/q/dev/`.
 
-## Packaging and running the application
+### Packaging and Running
 
-The application can be packaged using:
+To package:
 
-```shell script
+```
 ./mvnw package
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+To run the packaged application:
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+```
+java -jar target/quarkus-app/quarkus-run.jar
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+To build a native executable (optional):
 
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
+```
 ./mvnw package -Dnative
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+Run the native executable:
 
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
+```
+./target/kraQus-1.0.0-SNAPSHOT-runner
 ```
 
-You can then execute your native executable with: `./target/kraQus-1.0.0-SNAPSHOT-runner`
+## Project Structure
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
+- `calc/`: Technical indicator calculation services and DTOs.
+- `profit/`: Profit simulation and trading strategy services.
+- `learn/`: Machine learning trade signal management.
+- `model/`: Machine learning model metadata and execution.
+- `MyConfig.java`: Configuration and MongoDB connection management.
+
+## Contributing
+
+Feel free to contribute by opening issues or pull requests.

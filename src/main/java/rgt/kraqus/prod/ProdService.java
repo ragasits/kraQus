@@ -15,6 +15,7 @@ import rgt.kraqus.calc.CandleDTO;
 import rgt.kraqus.calc.CandleService;
 import rgt.kraqus.get.TradePairDTO;
 import rgt.kraqus.get.TradeService;
+import rgt.kraqus.model.ModelService;
 
 /**
  *
@@ -35,6 +36,9 @@ public class ProdService {
     @Inject
     ManagedExecutor executor;
 
+    @Inject
+    ModelService modelService;
+
     @Scheduled(cron = "{cron.expr}")
     public void startWork() {
 
@@ -54,6 +58,9 @@ public class ProdService {
         Date runDate = Calendar.getInstance().getTime();
         Log.info("runProduction: Start ");
 
+        //get Last Candle
+        CandleDTO lastCandle = candleService.getLast();
+
         try {
             // get Trades
             runTrade(runDate);
@@ -69,6 +76,11 @@ public class ProdService {
         } catch (MyException ex) {
             Log.error(ex.getMessage());
         }
+
+        //RunWeka prediction
+        this.runWeka(lastCandle);
+        
+        
         config.setRunProduction(true);
 
         Log.info("runProduction: Done");
@@ -131,6 +143,34 @@ public class ProdService {
             tradeService.callKrakenTrade(last);
             last = tradeService.getLastValue();
             lastTime = Long.parseLong(last.substring(0, 13));
+        }
+    }
+
+    /**
+     * Run WEKA prediction on the latest candle using the configured model.
+     */
+    private void runWeka(CandleDTO lastCandle) {
+        if (config.getModelName().equals("") || config.getModelName().isEmpty()) {
+            return;
+        }
+
+        // Get the model
+        rgt.kraqus.model.ModelDTO model = modelService.get(config.getModelName());
+        if (model == null) {
+            Log.warn("Model not found: " + config.getModelName());
+            return;
+        }
+
+        try {
+            // Run WEKA prediction on one candle        
+            List<CandleDTO> candleList = candleService.getNexts(lastCandle.getStartDate());
+            for (CandleDTO dto : candleList) {
+                modelService.runWekaOneCandle(model, dto);
+            }
+            
+            Log.info("runWeka: "+candleList.size());
+        } catch (MyException e) {
+            Log.error("Error running WEKA one candle", e);
         }
     }
 

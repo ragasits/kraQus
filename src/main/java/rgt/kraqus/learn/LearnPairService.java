@@ -214,7 +214,7 @@ public class LearnPairService {
                     BigDecimal maxProfit = BigDecimal.ZERO;
 
                     //Get next 1000 candles
-                    List<CandleDTO> nextCandleList = candleService.geNexts(candle.getStartDate(), scope);
+                    List<CandleDTO> nextCandleList = candleService.getNexts(candle.getStartDate(), scope);
                     for (CandleDTO next : nextCandleList) {
 
                         BigDecimal profit = next.getClose().subtract(candle.getClose());

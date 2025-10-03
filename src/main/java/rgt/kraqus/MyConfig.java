@@ -28,6 +28,10 @@ import rgt.kraqus.profit.ProfitDTO;
 @Singleton
 @Startup
 public class MyConfig {
+    
+    @Inject
+    @ConfigProperty(name = "kraqus.model.name", defaultValue = "") 
+    private String modelName;
 
     @Inject
     @ConfigProperty(name = "kraqus.model.dir", defaultValue = "/home/rgt/0dev/jakarta.ee/kraQus/model")
@@ -150,4 +154,7 @@ public class MyConfig {
         return modelDir;
     }
 
+    public String getModelName() {
+        return modelName;
+    }
 }

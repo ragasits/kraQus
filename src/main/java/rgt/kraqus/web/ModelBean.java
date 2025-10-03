@@ -5,10 +5,7 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.bson.types.Binary;
-import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.model.file.UploadedFile;
 
 import java.io.Serializable;
 import java.util.List;
