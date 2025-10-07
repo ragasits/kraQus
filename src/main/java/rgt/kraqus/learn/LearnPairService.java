@@ -14,10 +14,15 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.primefaces.component.knob.KnobBase;
 import rgt.kraqus.MyConfig;
 import rgt.kraqus.calc.CandleDTO;
 import rgt.kraqus.calc.CandleService;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instances;
 
 /**
  * Learn Pairs Service
@@ -284,5 +289,20 @@ public class LearnPairService {
         }
 
         return "Save " + learnName + ": OK";
+    }
+
+    /**
+     * Converts all LearnPairDTOs to Weka Instances.
+     *
+     * @return Instances containing all LearnPairDTO data.
+     */
+    public Instances toInstances() {
+        Instances instances = new Instances("learnPair", LearnPairDTO.getAttributes(), 0);
+
+        for (LearnPairDTO dto : this.get()) {
+            DenseInstance instance = dto.getValues(instances);
+            instances.add(instance);
+        }
+        return instances;
     }
 }

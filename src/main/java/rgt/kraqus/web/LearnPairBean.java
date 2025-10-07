@@ -5,10 +5,20 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import rgt.kraqus.learn.LearnPairDTO;
 import rgt.kraqus.learn.LearnPairService;
 import rgt.kraqus.learn.LearnService;
+import weka.core.Instances;
+import weka.core.converters.AbstractFileSaver;
+import weka.core.converters.CSVSaver;
 
 /**
  * JSF bean for Learn Pairs
@@ -31,6 +41,7 @@ public class LearnPairBean {
     private LearnService learnService;
 
     private String selectedLearnName;
+    private StreamedContent file;
 
     public List<String> complete(String query) {
         return learnService.getNames();
@@ -51,6 +62,17 @@ public class LearnPairBean {
     }
 
     /**
+     * Runs the full LearnPairs workflow: generate, select best, and save.
+     */
+    public void onRunAll() {
+        this.onGenerate();
+        this.onBestLearns();
+        this.onSaveLearn();
+
+        this.addInfoMsg("RuanAll: OK");
+    }
+
+    /**
      * Save best LearnPairs into Learns
      */
     public void onSaveLearn() {
@@ -63,8 +85,40 @@ public class LearnPairBean {
     }
 
     /**
+     * Exports LearnPairs data as a CSV file for download.
+     */
+    public void onCSVExport() {
+        try {
+            Instances instances = learnPairService.toInstances();
+            File tempFile = File.createTempFile("learnpair", ".tmp");
+
+            AbstractFileSaver saver = new CSVSaver();;
+            saver.setInstances(instances);
+            saver.setFile(tempFile);
+            saver.writeBatch();
+
+            final File fileToServe = tempFile;  // For lambda usage
+
+            this.file = DefaultStreamedContent.builder()
+                    .name("learnpair.csv")
+                    .contentType("application/octet-stream")
+                    .stream(() -> {
+                        try {
+                            return new FileInputStream(fileToServe);
+                        } catch (FileNotFoundException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    })
+                    .build();
+        } catch (IOException iOException) {
+            this.addMsg("Error: " + iOException.getMessage());
+        }
+    }
+
+    /**
      * Add error message to the GUI
-     * @param msg 
+     *
+     * @param msg
      */
     private void addMsg(String msg) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
@@ -72,7 +126,8 @@ public class LearnPairBean {
 
     /**
      * Add info message to the GUI
-     * @param msg 
+     *
+     * @param msg
      */
     private void addInfoMsg(String msg) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
@@ -104,6 +159,14 @@ public class LearnPairBean {
 
     public void setSelectedLearnName(String selectedLearnName) {
         this.selectedLearnName = selectedLearnName;
+    }
+
+    public StreamedContent getFile() {
+        return file;
+    }
+
+    public void setFile(StreamedContent file) {
+        this.file = file;
     }
 
 }

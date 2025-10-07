@@ -19,7 +19,7 @@
 
             <h:form id="form1">
 
-                <p:blockUI block="form1" trigger="chkBtn1, chkBtn2, chkBtn3">
+                <p:blockUI block="form1" trigger="chkBtn1, chkBtn2, chkBtn3, chkBtn4, csvBtn">
                     <p:graphicImage value="/ajax-loader.gif" />
                 </p:blockUI>  
 
@@ -52,6 +52,17 @@
 
                     <p:commandButton value="Save" action="#{learnPairBean.onSaveLearn()}"
                                      id="chkBtn3" update="tbl" title="Save as learn"/>
+
+                    <p:commandButton value="RunAll" action="#{learnPairBean.onRunAll()}"
+                                     id="chkBtn4" update="tbl" title="Save as learn"/>
+
+                    <p:commandButton value="toCSV" id="csvBtn"
+                                     actionListener="#{learnPairBean.onCSVExport()}"
+                                     onclick="PrimeFaces.monitorDownload(start, stop);"
+                                     ajax="true">
+                        <p:fileDownload value="#{learnPairBean.file}" />
+                    </p:commandButton>                     
+
                 </p:panelGrid>
 
                 <p:panel>
