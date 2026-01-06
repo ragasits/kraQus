@@ -33,6 +33,11 @@ public class LearnPairBean {
 
     private Integer minProfit = 2;
     private Integer scope = 1000;
+    private String profitThisYear;
+    private String profitLastYear;
+
+    @Inject
+    private ProfitBean profitBean;
 
     @Inject
     private LearnPairService learnPairService;
@@ -70,6 +75,43 @@ public class LearnPairBean {
         this.onSaveLearn();
 
         this.addInfoMsg("RuanAll: OK");
+    }
+
+    public void onRunAllProfit() {
+
+        //Check
+        if (this.selectedLearnName == null || this.selectedLearnName.isEmpty()) {
+            this.addErrorMsg("Missing value: learnName");
+            return;
+        }
+        if (this.minProfit == null) {
+            this.addErrorMsg("Missing value: minProfit");
+            return;
+        }
+        if (this.scope == null) {
+            this.addErrorMsg("Missing value: minProfit");
+            return;
+        }
+
+        //Run All
+        this.onRunAll();
+
+        //Calculate profit - Prepare
+        this.profitBean.setSelectedLearnName(selectedLearnName);
+        this.profitBean.setSelectedStrategy("FirtSell");
+        this.profitBean.onDeleteAll();
+
+        // This Year
+        this.profitBean.onThisYear();
+        this.profitBean.onCalc();
+        this.profitThisYear = this.profitBean.getDetail().getEurFormat();
+
+        //Last Year
+        this.profitBean.onLastYear();
+        this.profitBean.onCalc();
+        this.profitLastYear = this.profitBean.getDetail().getEurFormat();
+
+        this.addInfoMsg("RuanAll + Profit calc: OK");
     }
 
     /**
@@ -133,6 +175,15 @@ public class LearnPairBean {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
     }
 
+    /**
+     * Add error message to the GUI
+     *
+     * @param msg
+     */
+    private void addErrorMsg(String msg) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
+    }
+
     public Integer getMinProfit() {
         return minProfit;
     }
@@ -167,6 +218,14 @@ public class LearnPairBean {
 
     public void setFile(StreamedContent file) {
         this.file = file;
+    }
+
+    public String getProfitThisYear() {
+        return profitThisYear;
+    }
+
+    public String getProfitLastYear() {
+        return profitLastYear;
     }
 
 }

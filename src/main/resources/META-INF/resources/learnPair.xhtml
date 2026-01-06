@@ -8,7 +8,7 @@
       xmlns:ez="jakarta.faces.composite/ezcomp">
 
     <h:head>
-        <title>kraqus</title>
+        <title>KraQus</title>
     </h:head>
 
     <h:body>
@@ -19,37 +19,32 @@
 
             <h:form id="form1">
 
-                <p:blockUI block="form1" trigger="chkBtn1, chkBtn2, chkBtn3, chkBtn4, csvBtn">
+                <p:blockUI block="form1" trigger="chkBtn1, chkBtn2, chkBtn3, chkBtn4, csvBtn, runAllBtn">
                     <p:graphicImage value="/ajax-loader.gif" />
                 </p:blockUI>  
 
                 <p:messages id="msgs" showDetail="false" >
                     <p:autoUpdate />
                 </p:messages>   
+                
+                <p:panelGrid columns="10" layout="tabular" id="runPanel">
+                    <p:commandButton value="Run All + Profit" action="#{learnPairBean.onRunAllProfit()}"
+                                     id="runAllBtn" update="tbl, runPanel" title="Run All + Calculate profit"/>                    
 
-                <p:panelGrid columns="6" layout="tabular">
-                    <p:outputLabel value="Scope:"/>  
-                    <p:spinner value="#{learnPairBean.scope}"
-                               id="scope" min="1"/>
-
-
-                    <p:outputLabel value="MinProfit%:"/>  
-                    <p:spinner value="#{learnPairBean.minProfit}"
-                               id="minProfit" min="1"/>
-
-
+                    <p:outputLabel value="Profit: This Year:"/>  
+                    <p:outputLabel value="#{learnPairBean.profitThisYear}"/>  
+                    
+                    <p:outputLabel value="Profit: Last Year:"/>
+                    <p:outputLabel value="#{learnPairBean.profitLastYear}"/>  
+                    
+                    
                     <p:commandButton value="Generate" action="#{learnPairBean.onGenerate()}"
                                      id="chkBtn1" update="tbl" title="Generate learnPairs"/>
 
 
                     <p:commandButton value="Bests" action="#{learnPairBean.onBestLearns()}"
                                      id="chkBtn2" update="tbl" title="Seek Best learns"/>
-
-                    <p:outputLabel value="Learn:"/>  
-                    <p:autoComplete value="#{learnPairBean.selectedLearnName}"
-                                    completeMethod="#{learnPairBean.complete}">
-                    </p:autoComplete>
-
+                    
                     <p:commandButton value="Save" action="#{learnPairBean.onSaveLearn()}"
                                      id="chkBtn3" update="tbl" title="Save as learn"/>
 
@@ -62,6 +57,26 @@
                                      ajax="true">
                         <p:fileDownload value="#{learnPairBean.file}" />
                     </p:commandButton>                     
+                    
+                    
+                </p:panelGrid>                
+
+                <p:panelGrid columns="6" layout="tabular">
+                    <p:outputLabel value="Scope:"/>  
+                    <p:spinner value="#{learnPairBean.scope}"
+                               id="scope" min="1"/>
+
+
+                    <p:outputLabel value="MinProfit%:"/>  
+                    <p:spinner value="#{learnPairBean.minProfit}"
+                               id="minProfit" min="1"/>
+
+
+                    <p:outputLabel value="Learn:"/>  
+                    <p:autoComplete value="#{learnPairBean.selectedLearnName}"
+                                    completeMethod="#{learnPairBean.complete}">
+                    </p:autoComplete>
+
 
                 </p:panelGrid>
 

@@ -147,11 +147,12 @@ public class LearnService {
 
     /**
      * Get the last startDate from the last month
+     *
      * @param learnName
      * @param year
-     * @return 
+     * @return
      */
-    public Date getThisYearSell(String learnName, int year) {
+    public Date getThisYearSell(String learnName) {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_MONTH, 1);
         cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -171,20 +172,19 @@ public class LearnService {
                 .first();
 
         return learn.getStartDate();
-
     }
 
     /**
      * Get the first startDate from this year
+     *
      * @param learnName
      * @param year
-     * @return 
+     * @return
      */
     public Date getThisYearBuy(String learnName, int year) {
         Calendar cal = Calendar.getInstance();
         cal.set(year, 0, 1, 0, 0, 0);
         Date date = cal.getTime();
-
 
         LearnDTO learn = config.getLearnColl()
                 .find(
@@ -200,12 +200,14 @@ public class LearnService {
         return learn.getStartDate();
 
     }
-    
+
     /**
-     * Get the first 'buy' trade start date that is at least one year and one month earlier from current date.
-     * 
-     * This method calculates a date by subtracting one year and one month from the current date,
-     * then finds the earliest 'buy' trade on or after this calculated date for the specified learnName.
+     * Get the first 'buy' trade start date that is at least one year and one
+     * month earlier from current date.
+     *
+     * This method calculates a date by subtracting one year and one month from
+     * the current date, then finds the earliest 'buy' trade on or after this
+     * calculated date for the specified learnName.
      *
      * @param learnName the name identifier for the learn
      * @return the start date of the first 'buy' trade after the calculated date
@@ -213,8 +215,7 @@ public class LearnService {
     public Date getLastYearBuy(String learnName) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, -1);    // Subtract 1 year
-        cal.add(Calendar.MONTH, -1);   // Subtract 1 month
-        
+
         // Reset day and time fields
         cal.set(Calendar.DAY_OF_MONTH, 1);
         cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -223,7 +224,6 @@ public class LearnService {
         cal.set(Calendar.MILLISECOND, 0);
         Date date = cal.getTime();
 
-
         LearnDTO learn = config.getLearnColl()
                 .find(
                         and(
@@ -237,7 +237,7 @@ public class LearnService {
 
         return learn.getStartDate();
 
-    }    
+    }
 
     /**
      * Get Buys by learnName

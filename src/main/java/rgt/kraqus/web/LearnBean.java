@@ -99,7 +99,7 @@ public class LearnBean implements Serializable {
             this.addErrorMsg("Not a llowe to delete: Első");
         } else {
             learnService.delete(selectedLearn);
-            this.addInfoMsg("Delete OK: "+selectedLearn);
+            this.addInfoMsg("Delete OK: " + selectedLearn);
         }
     }
 
@@ -145,18 +145,20 @@ public class LearnBean implements Serializable {
 
     /**
      * Add message: Info
-     * @param msg 
+     *
+     * @param msg
      */
     private void addInfoMsg(String msg) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
     }
-    
+
     /**
      * Add message: Error
-     * @param msg 
+     *
+     * @param msg
      */
     private void addErrorMsg(String msg) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
-    }    
+    }
 
 }

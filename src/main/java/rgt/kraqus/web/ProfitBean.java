@@ -57,10 +57,8 @@ public class ProfitBean implements Serializable {
      */
     public void onLastYear() {
         //Get first element of current year
-        Calendar cal = Calendar.getInstance();
-        int year = cal.get(Calendar.YEAR);
         String learnName = this.detail.getLearnName();
-        this.detail.setSellDate(learnService.getThisYearSell(learnName, year));
+        this.detail.setSellDate(learnService.getThisYearSell(learnName));
 
         this.detail.setBuyDate(learnService.getLastYearBuy(learnName));
 
@@ -77,7 +75,7 @@ public class ProfitBean implements Serializable {
         String learnName = this.detail.getLearnName();
 
         this.detail.setBuyDate(learnService.getThisYearBuy(learnName, year));
-        this.detail.setSellDate(learnService.getThisYearSell(learnName, year));
+        this.detail.setSellDate(learnService.getThisYearSell(learnName));
     }
 
     /**
