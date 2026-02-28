@@ -229,7 +229,7 @@ public class ModelService {
                 dto.setClose(candle.getClose());
                 learnService.add(dto);
 
-                Log.info("runWekaOneCandle: " + candle.getStartDate() + ":" + trade);
+                Log.info(":" + dto.getClose() + " runWekaOneCandle: " + candle.getStartDate() + ":" + trade);
             }
         } catch (Exception ex) {
             throw new MyException("Weka error - prediction", ex);

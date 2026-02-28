@@ -72,6 +72,10 @@ public class ProfitBean implements Serializable {
         //Get first element of current year
         Calendar cal = Calendar.getInstance();
         int year = cal.get(Calendar.YEAR);
+        if (cal.get(Calendar.MONTH) == Calendar.JANUARY){
+            year--;
+        }
+        
         String learnName = this.detail.getLearnName();
 
         this.detail.setBuyDate(learnService.getThisYearBuy(learnName, year));

@@ -26,6 +26,7 @@ public class LearnBean implements Serializable {
     private long selectedBuyTime;
     private long selectedSellTime;
     private String selectedLearn;
+    private boolean showOnlyErrors = false;
 
     @Inject
     private LearnService learnService;
@@ -48,7 +49,7 @@ public class LearnBean implements Serializable {
      */
     public List<LearnDTO> getLearnList() {
         if (this.selectedLearn != null) {
-            return learnService.get(this.selectedLearn);
+            return learnService.get(this.selectedLearn, this.showOnlyErrors);
         }
         return Collections.emptyList();
     }
@@ -142,6 +143,15 @@ public class LearnBean implements Serializable {
     public void setSelectedSellTime(long selectedSellTime) {
         this.selectedSellTime = selectedSellTime;
     }
+
+    public boolean isShowOnlyErrors() {
+        return showOnlyErrors;
+    }
+
+    public void setShowOnlyErrors(boolean showOnlyErrors) {
+        this.showOnlyErrors = showOnlyErrors;
+    }
+    
 
     /**
      * Add message: Info

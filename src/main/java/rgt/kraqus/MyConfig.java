@@ -28,9 +28,9 @@ import rgt.kraqus.profit.ProfitDTO;
 @Singleton
 @Startup
 public class MyConfig {
-    
+
     @Inject
-    @ConfigProperty(name = "kraqus.model.name", defaultValue = "") 
+    @ConfigProperty(name = "kraqus.model.name", defaultValue = "")
     private String modelName;
 
     @Inject
@@ -82,6 +82,13 @@ public class MyConfig {
         }
 
         this.learnColl = database.getCollection("learn", LearnDTO.class);
+        if (!this.isIndex(learnColl, "name_1_startDate_1")) {
+            this.learnColl.createIndex(
+                    Indexes.ascending("name", "startDate"),
+                    new IndexOptions().unique(true)
+            );
+        }
+
         this.modelColl = database.getCollection("model", ModelDTO.class);
 
         this.learnPairlColl = database.getCollection("learnPair", LearnPairDTO.class);

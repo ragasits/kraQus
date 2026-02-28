@@ -6,6 +6,8 @@ import static com.mongodb.client.model.Filters.gt;
 import static com.mongodb.client.model.Filters.gte;
 import static com.mongodb.client.model.Filters.lt;
 import static com.mongodb.client.model.Filters.lte;
+import static com.mongodb.client.model.Filters.ne;
+
 import com.mongodb.client.model.Sorts;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,6 +30,7 @@ public class LearnService {
     private static final String STARTDATE = "startDate";
     private static final String LEARNNAME = "name";
     private static final String TRADE = "trade";
+    private static final String CHK_MESSAGE = "chkMessage";
 
     @Inject
     private MyConfig config;
@@ -71,6 +74,26 @@ public class LearnService {
                 .find(eq(LEARNNAME, learnName))
                 .sort(Sorts.ascending(STARTDATE))
                 .into(new ArrayList<>());
+    }
+
+    /**
+     * Get Learns filter by name and check
+     * @param learnName
+     * @param onlyErrors
+     * @return 
+     */
+    public List<LearnDTO> get(String learnName, boolean onlyErrors) {
+
+        if (onlyErrors) {
+
+            return config.getLearnColl()
+                    .find(and(eq(LEARNNAME, learnName), ne(CHK_MESSAGE, null)))
+                    .sort(Sorts.ascending(STARTDATE))
+                    .into(new ArrayList<>());
+
+        } else {
+            return this.get(learnName);
+        }
     }
 
     /**

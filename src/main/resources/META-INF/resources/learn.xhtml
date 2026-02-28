@@ -32,7 +32,7 @@
                     <p:autoUpdate />
                 </p:messages>   
 
-                <p:panelGrid columns="10" layout="tabular">
+                <p:panelGrid columns="12" layout="tabular">
                     <p:outputLabel value="Learn:" style="font-weight: bold"/>
                     <p:selectOneMenu value="#{learnBean.selectedLearn}" id="nameList">
                         <f:selectItem itemLabel="-" itemValue=""/>
@@ -59,6 +59,9 @@
                         <f:selectItems value="#{learnBean.sellList}" var="item1" 
                                        itemLabel="#{item1.startDate}" itemValue="#{item1.startDate.time}" />                          
                     </p:selectOneMenu>
+
+                    <p:outputLabel value="ShowOnlyErrors"/>
+                    <p:selectBooleanCheckbox value="#{learnBean.showOnlyErrors}"/>
 
                     <p:commandButton value="Check1" action="#{learnBean.chkLearnPeaks()}"
                                      id="chkBtn1" update="tbl" title="Looking for peaks and valleys"/>

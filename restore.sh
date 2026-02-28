@@ -1,3 +1,3 @@
 #!/bin/bash
 
-mongorestore --db kraqus --gzip --drop ./dump/krakEE
+mongorestore --db kraqus --gzip --drop ./dump/kraqus

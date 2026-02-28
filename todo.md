@@ -1,5 +1,5 @@
-+ LearnPair: Run calculation in one step and display the profit values
-+ Bug: Learn: Fix LastYear+buy -> wrong value
++ Learn: Add  ame_1_startDate_1 unique index
++ Learn: ShowOnlyErrors -> Show only the error messages 
 
 - Bug: Learn: ThisYear wrong values
 - Bug: Generated LearnPair -> Learn:aa -> More Sells (6556) than Buys (6509) 
